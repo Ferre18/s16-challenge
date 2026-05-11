@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adventure Novel</title>
+    <!-- Load Phaser from CDN (requires Live Server or any local server) -->
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #game-container {
+            position: relative;
+        }
+        /* The chat input is placed over the Phaser canvas */
+        #chat-input {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 12px 15px;
+            font-size: 18px;
+            font-family: 'Press Start 2P', monospace;
+            background: #1e1e1e;
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            outline: none;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,255,204,0.3);
+        }
+        #chat-input::placeholder {
+            color: #00ffcc88;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container"></div>
+
+<script>
+// =====================================================
+// 1. Phaser Game Configuration
+// =====================================================
+const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    backgroundColor: '#111111',
+    parent: 'game-container',
+    scene: {
+        create: create
+    },
+    // No physics needed for a text adventure
+    physics: { default: false }
+};
+
+const game = new Phaser.Game(config);
+
+// =====================================================
+// 2. Game variables
+// =====================================================
+let storyText;          // Phaser Text object that shows all dialogue
+let chatInput;          // HTML input element
+let gameState;          // holds player location, inventory, etc.
+
+// =====================================================
+// 3. Scene: create everything
+// =====================================================
+function create() {
+    // --- Decorative background (parchment look) ---
+    const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+    bgGraphics.fillStyle(0x2b2b1a);
+    bgGraphics.fillRect(0, 0, 800, 600);
+    // Add a subtle border
+    bgGraphics.lineStyle(4, 0xaa8833);
+    bgGraphics.strokeRect(4, 4, 792, 592);
+    bgGraphics.generateTexture('parchment', 800, 600);
+    bgGraphics.destroy();
+    this.add.image(0, 0, 'parchment').setOrigin(0, 0);
+
+    // --- Output text box (story display) ---
+    storyText = this.add.text(30, 30, '', {
+        fontFamily: '"Courier New", monospace',
+        fontSize: '18px',
+        color: '#f0e6c5',
+        wordWrap: { width: 740 },
+        lineSpacing: 6
+    });
+    // We'll manage a maximum of ~25 lines visible, then scroll
+    storyText.setMaxLines = 25;   // custom property
+    storyText.fullHistory = '';   // keep all text to recalc if needed
+
+    // --- Initialize game world (our mock adventure state) ---
+    resetGameState();
+
+    // --- Create the HTML chat input ---
+    chatInput = document.createElement('input');
+    chatInput.type = 'text';
+    chatInput.id = 'chat-input';
+    chatInput.placeholder = 'What do you do?';
+    document.getElementById('game-container').appendChild(chatInput);
+
+    // Focus the input so the player can start typing immediately
+    chatInput.focus();
+
+    // Listen for Enter key
+    chatInput.addEventListener('keydown', handleInput);
+
+    // Make sure clicking the canvas doesn't steal focus from the input
+    this.input.on('pointerdown', () => chatInput.focus());
+
+    // --- Display the opening scene ---
+    addStoryLine('You awake in a dim stone chamber. Dusty air, cold floor.');
+    addStoryLine('A single torch flickers on the wall, revealing a door to the NORTH.');
+    addStoryLine('A rusty KEY lies on the ground.');
+    addStoryLine('');
+    addStoryLine('Type a command (look, go north, take key, inventory, help).');
+}
+
+// =====================================================
+// 4. Handle player input
+// =====================================================
+function handleInput(event) {
+    if (event.key === 'Enter') {
+        const command = chatInput.value.trim();
+        chatInput.value = '';           // clear the input
+        if (command === '') return;
+
+        // Echo the player's command on screen
+        addStoryLine('> ' + command);
+
+        // Send to our mock LLM and get a response
+        const response = mockLLM(command);
+        addStoryLine(response);
+        addStoryLine('');   // blank line for readability
+
+        // Scroll to keep latest text visible
+        scrollToBottom();
+    }
+}
+
+// =====================================================
+// 5. Add a line to the story display
+// =====================================================
+function addStoryLine(line) {
+    // Append to full history
+    storyText.fullHistory += line + '\n';
+
+    // Show only the last N lines (e.g., 25)
+    const lines = storyText.fullHistory.split('\n');
+    const visibleLines = lines.slice(-25).join('\n');
+    storyText.setText(visibleLines);
+}
+
+// =====================================================
+// 6. Auto-scroll (not strictly needed because we clip to 25 lines,
+//    but you could also scroll using a container/mask; here we just
+//    ensure the text object stays at the top, lines naturally flow down)
+function scrollToBottom() {
+    // For simplicity, the visible text is always the last 25 lines,
+    // so it's already "scrolled". Nothing extra required.
+}
+
+// =====================================================
+// 7. Mock LLM – our simple adventure engine
+// =====================================================
+function mockLLM(input) {
+    const cmd = input.toLowerCase().trim();
+    const words = cmd.split(' ');
+    const verb = words[0];
+    const noun = words.slice(1).join(' ');
+
+    // --- Universal commands ---
+    if (verb === 'help') {
+        return 'Commands: look, go [direction], take [item], inventory, help';
+    }
+
+    if (verb === 'look' || cmd === 'l') {
+        return look();
+    }
+
+    if (verb === 'inventory' || cmd === 'i') {
+        return showInventory();
+    }
+
+    // --- Movement ---
+    if (verb === 'go' || verb === 'walk' || verb === 'move') {
+        const direction = noun;   // e.g., "north"
+        if (!direction) return 'Go where? (north, south, east, west)';
+        return movePlayer(direction);
+    }
+
+    // --- Item interaction ---
+    if (verb === 'take' || verb === 'get' || verb === 'pick') {
+        if (!noun) return 'Take what?';
+        return takeItem(noun);
+    }
+
+    if (verb === 'use') {
+        return 'You try to use the ' + noun + ', but nothing happens.';
+    }
+
+    if (verb === 'drop') {
+        return 'You decide to keep the ' + noun + ' for now.';
+    }
+
+    // --- Fallback LLM-like flavour ---
+    const genericReplies = [
+        `You ponder the meaning of "${input}".`,
+        `A voice in the darkness whispers, "Interesting..."`,
+        `That action has no visible effect.`,
+        `The stone walls do not understand "${input}".`,
+        `Perhaps you could try looking around or taking something.`
+    ];
+    return genericReplies[Math.floor(Math.random() * genericReplies.length)];
+}
+
+// =====================================================
+// 8. Game state & helper functions
+// =====================================================
+function resetGameState() {
+    gameState = {
+        currentRoom: 'cell',
+        inventory: [],
+        rooms: {
+            cell: {
+                description: 'You are in a cold prison cell. A heavy wooden door leads NORTH.',
+                exits: { north: 'hallway' },
+                items: ['key']
+            },
+            hallway: {
+                description: 'A long, torchlit hallway stretches EAST and WEST. The cell door is SOUTH.',
+                exits: { south: 'cell', east: 'treasure_room', west: 'abyss' },
+                items: []
+            },
+            treasure_room: {
+                description: 'This room glitters with gold! The exit is WEST.',
+                exits: { west: 'hallway' },
+                items: ['crown', 'sword']
+            },
+            abyss: {
+                description: 'You stand at the edge of a bottomless pit. Cold wind rises from below. The only way is back EAST.',
+                exits: { east: 'hallway' },
+                items: []
+            }
+        }
+    };
+}
+
+function look() {
+    const room = gameState.rooms[gameState.currentRoom];
+    let desc = room.description;
+    if (room.items.length > 0) {
+        desc += `\nYou see: ${room.items.join(', ')}.`;
+    }
+    return desc;
+}
+
+function showInventory() {
+    if (gameState.inventory.length === 0) return 'You are carrying nothing.';
+    return 'You carry: ' + gameState.inventory.join(', ') + '.';
+}
+
+function movePlayer(direction) {
+    const room = gameState.rooms[gameState.currentRoom];
+    const newRoom = room.exits[direction];
+    if (!newRoom) {
+        return `You cannot go ${direction} from here.`;
+    }
+    gameState.currentRoom = newRoom;
+    return look();   // automatically describe the new room
+}
+
+function takeItem(itemName) {
+    const room = gameState.rooms[gameState.currentRoom];
+    const idx = room.items.indexOf(itemName);
+    if (idx === -1) {
+        return `There is no ${itemName} here to take.`;
+    }
+    room.items.splice(idx, 1);
+    gameState.inventory.push(itemName);
+    return `You take the ${itemName}.`;
+}
+
+</script>
+
+</body>
+</html>
