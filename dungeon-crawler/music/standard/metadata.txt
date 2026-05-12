@@ -1,0 +1,5 @@
+1 -> fantasy (basic)
+2 -> shadow realm
+3 -> volcano
+4 -> toxic factory
+5 -> frozen tundra
