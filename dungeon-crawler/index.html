@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Retro Adventure</title>
+  <title>NEVERENDING ABYSS</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,7 +36,7 @@
       pointer-events: none;
       position: absolute;
       inset: 0;
-      z-index: 100;
+      z-index: 200;
       background: repeating-linear-gradient(
         to bottom,
         transparent 0px,
@@ -52,8 +52,27 @@
       pointer-events: none;
       position: absolute;
       inset: 0;
-      z-index: 99;
+      z-index: 199;
       background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
+    }
+
+    /* ── Background image layer ── */
+    #bg-image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    /* Dark overlay so text stays readable over any image */
+    #bg-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.62);
     }
 
     /* ── Title bar ── */
@@ -61,7 +80,8 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 36px;
-      background: #0d0d0d;
+      z-index: 10;
+      background: rgba(13,13,13,0.9);
       border-bottom: 2px solid #f2ead3;
       display: flex;
       align-items: center;
@@ -69,7 +89,7 @@
       color: #f2ead3;
       font-size: 10px;
       letter-spacing: 3px;
-      text-shadow: 0 0 8px #00ff66;
+      text-shadow: 0 0 8px #f2ead3;
     }
 
     /* ── Story viewport ── */
@@ -79,6 +99,7 @@
       left: 16px; right: 16px;
       bottom: 80px;
       overflow: hidden;
+      z-index: 10;
     }
 
     #story-text {
@@ -98,7 +119,8 @@
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 72px;
-      background: #0d0d0d;
+      z-index: 10;
+      background: rgba(13,13,13,0.92);
       border-top: 2px solid #f2ead3;
       display: flex;
       align-items: center;
@@ -134,7 +156,7 @@
     }
 
     #player-input::placeholder {
-      color: #f2ead3;
+      color: rgba(242,234,211,0.45);
       font-size: 10px;
     }
 
@@ -152,21 +174,238 @@
     }
 
     #submit-btn:hover {
-      background: rgba(0,255,80,0.08);
-      box-shadow: 0 0 12px rgba(217, 235, 222, 0.45);
+      background: rgba(242,234,211,0.08);
+      box-shadow: 0 0 12px rgba(242,234,211,0.45);
     }
 
-    /* Busy state dims the input */
     #input-row.busy {
       opacity: 0.4;
       pointer-events: none;
     }
+
+    /* ── START MENU overlay ── */
+    #start-menu {
+      position: absolute;
+      inset: 0;
+      z-index: 150;
+      background: rgba(0,0,0,0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 40px;
+    }
+
+    #start-menu h1 {
+      color: #f2ead3;
+      font-size: 16px;
+      letter-spacing: 4px;
+      text-shadow: 0 0 16px #f2ead3;
+      text-align: center;
+      line-height: 2;
+    }
+
+    #start-menu p {
+      color: rgba(242,234,211,0.7);
+      font-size: 9px;
+      text-align: center;
+      line-height: 2.2;
+      max-width: 720px;
+    }
+
+    #char-desc-label {
+      color: #f2ead3;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    #char-race-label {
+      color: #f2ead3;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    #char-level-label {
+      color: #f2ead3;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    #char-desc-input {
+      width: 100%;
+      max-width: 720px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #f2ead3;
+      color: #f2ead3;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      padding: 8px 6px;
+      outline: none;
+      caret-color: #f2ead3;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(242,234,211,0.5);
+    }
+
+    #char-level-input {
+      width: 100%;
+      max-width: 720px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #f2ead3;
+      color: #f2ead3;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      padding: 8px 6px;
+      outline: none;
+      caret-color: #f2ead3;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(242,234,211,0.5);
+    }
+
+    #char-race-input {
+      width: 100%;
+      max-width: 720px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #f2ead3;
+      color: #f2ead3;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      padding: 8px 6px;
+      outline: none;
+      caret-color: #f2ead3;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(242,234,211,0.5);
+    }
+
+    #char-desc-input::placeholder {
+      color: rgba(242,234,211,0.35);
+      font-size: 9px;
+    }
+
+    #start-btn {
+      margin-top: 8px;
+      background: transparent;
+      border: 2px solid #f2ead3;
+      color: #f2ead3;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      padding: 10px 24px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px #f2ead3;
+      box-shadow: 0 0 12px rgba(242,234,211,0.2);
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+
+    #start-btn:hover {
+      background: rgba(242,234,211,0.1);
+      box-shadow: 0 0 20px rgba(242,234,211,0.45);
+    }
+
+    /* ── HP bars ── */
+    #hud {
+      position: absolute;
+      top: 44px; left: 0; right: 0;
+      height: 28px;
+      z-index: 11;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(13,13,13,0.85);
+      border-bottom: 1px solid rgba(242,234,211,0.3);
+      gap: 12px;
+    }
+
+    .hud-label {
+      color: #f2ead3;
+      font-size: 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 10px;
+      background: rgba(242,234,211,0.12);
+      border: 1px solid rgba(242,234,211,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    #player-bar-fill { background: #6adf7e; }
+    #monster-bar-fill { background: #df6a6a; }
   </style>
 </head>
 <body>
 
 <div id="screen">
-  <div id="titlebar">★ RETRO ADVENTURE v1.0 ★</div>
+  <div id="bg-image"></div>
+
+  <!-- START MENU -->
+  <!-- START MENU -->
+<div id="start-menu">
+  <h1>★ NEVERENDING ABYSS ★</h1>
+
+  <p>
+    Face ever-stronger monsters. Survive by wit and spoils.<br/>
+    Describe your character — the world will remember who you are.
+  </p>
+
+  <!-- Character Description -->
+<label id="char-desc-label" for="char-desc-input">WHO ARE YOU?</label>  <input
+    id="char-desc-input"
+    type="text"
+    placeholder="e.g. a cunning rogue with a taste for danger"
+    autocomplete="off"
+    spellcheck="false"
+    maxlength="50"
+  />
+
+  <!-- Race Input -->
+   <label id="char-race-label" for="char-race-input">What is your race?</label>
+
+  <input
+    id="char-race-input"
+    type="text"
+    placeholder="e.g. Human, Elf, Construct"
+    autocomplete="off"
+    spellcheck="false"
+    maxlength="10"
+  />
+
+  <!-- Hardcoded Level -->
+<label id="char-level-label" for="char-level-input">What is your level?</label>
+  <input
+    id="char-level-input"
+    type="number"
+    value="1"
+  />
+
+  <button id="start-btn" onclick="startGame()">► BEGIN ◄</button>
+</div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <span class="hud-label">YOU</span>
+    <div class="bar-track"><div class="bar-fill" id="player-bar-fill" style="width:100%"></div></div>
+    <span class="hud-label" id="player-hp-label">100</span>
+    &nbsp;&nbsp;
+    <span class="hud-label" id="monster-name-label">MONSTER</span>
+    <div class="bar-track"><div class="bar-fill" id="monster-bar-fill" style="width:100%"></div></div>
+    <span class="hud-label" id="monster-hp-label">100</span>
+  </div>
+
+  <div id="titlebar">★ NEVERENDING ABYSS v1.0 ★</div>
 
   <div id="story-viewport">
     <div id="story-text"></div>
@@ -180,120 +419,259 @@
 </div>
 
 <script>
-/* ================================================
-   GAME STATE
-================================================ */
-let gameState;
+/* ============================================================
+   backgrounds JSON
+   Add more entries here — the game picks one at random per encounter.
+   Each entry: { path, description }
+   'path' can be a URL or relative path to an image.
+============================================================ */
+let backgrounds = [
+  {
+    path: 'https://images.unsplash.com/photo-1518562180175-34a163b1a9a6?w=800&q=80',
+    description: 'A damp stone cavern lit by phosphorescent moss. Dripping water echoes from unseen depths. The air smells of iron and old bones.'
+  },
+  {
+    path: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
+    description: 'A dense, twisted forest where the canopy blots out all sunlight. Gnarled roots claw at the ground like frozen fingers. Something large moves between the trees.'
+  },
+  {
+    path: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+    description: 'A jagged mountain pass scoured by freezing winds. Ice coats every surface. Far below, the valley is hidden by cloud.'
+  },
+  {
+    path: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&q=80',
+    description: 'The smouldering rim of a volcanic crater. Rivers of lava carve orange veins through black rock. The heat is almost unbearable.'
+  },
+  {
+    path: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
+    description: 'A fog-shrouded shoreline where black waves crash against pale sand. The sea hides something vast and patient beneath its surface.'
+  },
+];
 
-function resetGameState() {
-  gameState = {
-    currentRoom: 'cell',
-    inventory: [],
-    rooms: {
-      cell: {
-        description: 'You are in a cold prison cell. A heavy wooden door leads NORTH.',
-        exits: { north: 'hallway' },
-        items: ['key']
-      },
-      hallway: {
-        description: 'A torchlit hallway stretches EAST and WEST. The cell door is SOUTH.',
-        exits: { south: 'cell', east: 'treasure_room', west: 'abyss' },
-        items: []
-      },
-      treasure_room: {
-        description: 'This room glitters with gold! The exit is WEST.',
-        exits: { west: 'hallway' },
-        items: ['crown', 'sword']
-      },
-      abyss: {
-        description: 'You stand at the edge of a bottomless pit. Cold wind rises from below. The only way is back EAST.',
-        exits: { east: 'hallway' },
-        items: []
-      }
+// Function to fetch and append local images from JSON
+async function appendLocalImages() {
+  try {
+    const response = await fetch('backgrounds.json');
+    const localBackgrounds = await response.json();
+    
+    // Append each local entry to the existing `backgrounds` array
+    backgrounds.push(...localBackgrounds);
+    
+    console.log(`Added ${localBackgrounds.length} local images. Total now: ${backgrounds.length}`);
+    
+    // If you have a renderizer function that displays the images,
+    // call it again to refresh the UI with the updated list
+    if (typeof renderizer === 'function') {
+      renderizer();  // or pass the new `backgrounds` array if needed
     }
-  };
+  } catch (error) {
+    console.error('Failed to load local backgrounds:', error);
+  }
 }
 
-/* ================================================
-   MOCK LLM  (swap this function for a real API call)
-================================================ */
-function mockLLM(input) {
-  const cmd   = input.toLowerCase().trim();
-  const words = cmd.split(' ');
-  const verb  = words[0];
-  const noun  = words.slice(1).join(' ');
+// Call the function on startup
+appendLocalImages();
 
-  if (verb === 'help')
-    return 'Commands: look, go [dir], take [item], inventory, help';
-  if (verb === 'look' || cmd === 'l')
-    return look();
-  if (verb === 'inventory' || cmd === 'i')
-    return showInventory();
-  if (verb === 'go' || verb === 'walk' || verb === 'move')
-    return noun ? movePlayer(noun) : 'Go where? (north, south, east, west)';
-  if (verb === 'take' || verb === 'get' || verb === 'pick')
-    return noun ? takeItem(noun) : 'Take what?';
-  if (verb === 'use')
-    return `You try to use the ${noun}, but nothing happens.`;
-  if (verb === 'drop')
-    return `You decide to keep the ${noun} for now.`;
+/* ============================================================
+   GAME STATE
+============================================================ */
+const state = {
+  phase: 'menu',        // menu | encounter | reward | dead
+  playerDesc: '',
+  playerLevel: '',
+  playerRace: '',
+  inventory: [],
+  monstersDefeated: 0,
+  background: null,
+  monster: null,        // { name, description, hp, maxHp }
+  player: { hp: 100, maxHp: 100 },
+};
 
-  const generic = [
-    `You ponder the meaning of "${input}".`,
-    'A voice in the darkness whispers... "Interesting."',
-    'That action has no visible effect.',
-    'The stone walls stare back blankly.',
-    'Perhaps try: look, go [dir], take [item], inventory.'
-  ];
-  return generic[Math.floor(Math.random() * generic.length)];
-}
+/* ============================================================
+   LLM INTERFACE
+   ----------------------------------------------------------
+   Each function below builds the exact prompt that will be
+   sent to the real LLM, then calls mockLLMResponse() which
+   simulates a reply. To wire up a real API, replace the body
+   of mockLLMResponse() with a fetch() call to your endpoint,
+   using the prompt string it receives.
+============================================================ */
 
-function look() {
-  const room = gameState.rooms[gameState.currentRoom];
-  let desc = room.description;
-  if (room.items.length) desc += `\nYou see: ${room.items.join(', ')}.`;
-  return desc;
-}
-function showInventory() {
-  return gameState.inventory.length
-    ? 'You carry: ' + gameState.inventory.join(', ') + '.'
-    : 'You are carrying nothing.';
-}
-function movePlayer(dir) {
-  const exit = gameState.rooms[gameState.currentRoom].exits[dir];
-  if (!exit) return `You cannot go ${dir} from here.`;
-  gameState.currentRoom = exit;
-  return look();
-}
-function takeItem(name) {
-  const room = gameState.rooms[gameState.currentRoom];
-  const idx  = room.items.indexOf(name);
-  if (idx === -1) return `There is no ${name} here.`;
-  room.items.splice(idx, 1);
-  gameState.inventory.push(name);
-  return `You take the ${name}.`;
+/**
+ * PROMPT 1 — Ask the LLM to create a monster for the current encounter.
+ */
+function buildMonsterPrompt(background, difficulty) {
+  return `You are the game master of a retro fantasy adventure game.
+
+SETTING:
+${background.description}
+
+PLAYER DESCRIPTION:
+${state.playerDesc}
+
+PLAYER INVENTORY:
+${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
+
+DIFFICULTY (monsters defeated so far): ${difficulty}
+
+Your task: Create a single monster appropriate for this setting and difficulty level.
+Stronger difficulty means a more powerful, cunning, or terrifying creature.
+
+Respond with ONLY valid JSON in this exact shape:
+{
+  "name": "Monster Name",
+  "description": "2-3 sentence vivid description of the monster's appearance and threat.",
+  "intro": "1-2 sentence atmospheric intro shown to the player when the monster appears.",
+  "hp": <integer 1-100, scaled with difficulty>
+}`;
 }
 
-/* ================================================
+/**
+ * PROMPT 2/3 — Ask the LLM to resolve one player action in combat.
+ */
+function buildCombatPrompt(playerAction, monster, background) {
+  return `You are the game master of a retro fantasy adventure game.
+
+SETTING:
+${background.description}
+
+PLAYER DESCRIPTION:
+${state.playerDesc}
+
+PLAYER INVENTORY:
+${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
+
+MONSTER:
+Name: ${monster.name}
+Description: ${monster.description}
+Monster HP remaining: ${monster.hp} / ${monster.maxHp}
+
+Player HP remaining: ${state.player.hp} / ${state.player.maxHp}
+
+PLAYER ACTION:
+"${playerAction}"
+
+Resolve this action dramatically. Decide how much damage (if any) is dealt to the monster and/or the player.
+Consider the player's items, description, setting, and action creativity.
+
+Respond with ONLY valid JSON in this exact shape:
+{
+  "narrative": "2-4 sentence description of what happens.",
+  "playerDamage": <integer 0-40, damage taken by the player>,
+  "monsterDamage": <integer 0-40, damage dealt to the monster>,
+  "outcome": "ongoing" | "player_wins" | "monster_wins"
+}`;
+}
+
+/**
+ * PROMPT 4 — Ask the LLM to generate a reward item after the player wins.
+ */
+function buildRewardPrompt(monster, background) {
+  return `You are the game master of a retro fantasy adventure game.
+
+SETTING:
+${background.description}
+
+PLAYER DESCRIPTION:
+${state.playerDesc}
+
+PLAYER INVENTORY:
+${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
+
+DEFEATED MONSTER:
+${monster.name} — ${monster.description}
+
+The player has just defeated this monster. Create one unique item they find or can claim as a reward.
+It should feel thematically linked to the monster and setting, and be concisely described in ≤10 words.
+
+Respond with ONLY valid JSON in this exact shape:
+{
+  "item": "Short evocative item name and descriptor",
+  "flavour": "One sentence about what makes this item special or eerie."
+}`;
+}
+
+/* ============================================================
+   MOCK LLM RESPONSE
+   ----------------------------------------------------------
+   Receives the prompt string (for inspection/logging),
+   returns a parsed JS object matching the expected JSON shape.
+   Replace this entire function body with a real fetch() call.
+============================================================ */
+async function mockLLMResponse(prompt) {
+  // Log the prompt so you can inspect it in the console
+  console.groupCollapsed('[LLM PROMPT]');
+  console.log(prompt);
+  console.groupEnd();
+
+  // Simulated network delay
+  await delay(600 + Math.random() * 600);
+
+  // ── Detect which prompt type we're dealing with ──
+  if (prompt.includes('Create a single monster')) {
+    const diff = state.monstersDefeated;
+    const names = ['Cave Troll', 'Shadow Wraith', 'Stone Golem', 'Plague Bat', 'Iron Lich', 'Void Drake', 'Bone Colossus'];
+    const name = names[Math.min(diff, names.length - 1)];
+    const hp = Math.min(30 + diff * 12, 100);
+    return {
+      name,
+      description: `A ${name.toLowerCase()} of considerable menace. Its presence warps the air around it. Ancient and hungry.`,
+      intro: `From the darkness, a ${name.toLowerCase()} emerges — its eyes fixed on you with cold intent.`,
+      hp,
+    };
+  }
+
+  if (prompt.includes('Resolve this action')) {
+    const monsterDamage = Math.floor(Math.random() * 28) + 2;
+    const playerDamage  = Math.floor(Math.random() * 18);
+    const monsterHpAfter = state.monster.hp - monsterDamage;
+    const playerHpAfter  = state.player.hp  - playerDamage;
+    const outcome =
+      monsterHpAfter <= 0 ? 'player_wins' :
+      playerHpAfter  <= 0 ? 'monster_wins' :
+      'ongoing';
+    return {
+      narrative: outcome === 'player_wins'
+        ? `Your strike finds its mark with brutal precision. The ${state.monster.name} lets out a final shriek and crumbles.`
+        : outcome === 'monster_wins'
+        ? `The ${state.monster.name} overwhelms you with a devastating blow. Darkness closes in.`
+        : `You press your attack. The ${state.monster.name} staggers — but retaliates, catching you off guard.`,
+      playerDamage,
+      monsterDamage,
+      outcome,
+    };
+  }
+
+  if (prompt.includes('Create one unique item')) {
+    const items = [
+      { item: 'Fang of the Fallen — a jagged obsidian tooth', flavour: 'Radiates a cold hunger that never quite leaves your hand.' },
+      { item: 'Wraith-silk Cloak — woven from shadow itself', flavour: 'Those who wear it feel slightly less real.' },
+      { item: 'Ember Core — a pulsing shard of solidified fire', flavour: 'Keeps your palm warm even in the deepest cold.' },
+      { item: 'Void-touched Lens — warps what you see', flavour: 'Through it, hidden things become briefly visible.' },
+      { item: 'Bone Sigil — carved from something that once spoke', flavour: 'Hums faintly when danger is near.' },
+    ];
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  return { error: 'Unknown prompt type.' };
+}
+
+/* ============================================================
    TYPEWRITER ENGINE
-================================================ */
-const storyEl   = document.getElementById('story-text');
-const inputRow  = document.getElementById('input-row');
-const inputEl   = document.getElementById('player-input');
+============================================================ */
+const storyEl  = document.getElementById('story-text');
+const inputRow = document.getElementById('input-row');
+const inputEl  = document.getElementById('player-input');
 
-let   storyLog  = '';
-let   isBusy    = false;
-let   typeQueue = [];
-let   typing    = false;
+let storyLog   = '';
+let isBusy     = false;
+let typeQueue  = [];
+let typing     = false;
 
 function setBusy(busy) {
   isBusy = busy;
   inputRow.classList.toggle('busy', busy);
   if (!busy) inputEl.focus();
-}
-
-function appendLog(chunk) {
-  storyLog += chunk;
 }
 
 function typeWrite(text, onDone) {
@@ -306,71 +684,269 @@ function drainQueue() {
   typing = true;
   const { text, onDone } = typeQueue.shift();
   let i = 0;
-  const interval = setInterval(() => {
+  const iv = setInterval(() => {
     if (i >= text.length) {
-      clearInterval(interval);
+      clearInterval(iv);
       if (onDone) onDone();
       drainQueue();
       return;
     }
-    appendLog(text[i++]);
+    storyLog += text[i++];
     storyEl.textContent = storyLog;
-    // Keep text anchored at the bottom of the viewport
-    const vp = storyEl.parentElement;
-    if (storyEl.offsetHeight < vp.offsetHeight) {
+    // keep latest text visible
+    if (storyEl.offsetHeight > storyEl.parentElement.offsetHeight) {
+      storyEl.style.top = 'auto';
       storyEl.style.bottom = '0';
-    } else {
-      storyEl.style.bottom = '0';
-      storyEl.style.position = 'absolute';
     }
-  }, 28);
+  }, 24);
 }
 
-/* ================================================
-   PLAYER INPUT
-================================================ */
-function submitInput() {
-  if (isBusy) return;
-  const cmd = inputEl.value.trim();
-  if (!cmd) return;
-  inputEl.value = '';
+function print(text, cb) {
+  typeWrite(text + '\n', cb);
+}
 
+function delay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+/* ============================================================
+   HUD
+============================================================ */
+const hud = document.getElementById('hud');
+
+function showHUD(monsterName) {
+  hud.style.display = 'flex';
+  // shift viewport down to make room
+  document.getElementById('story-viewport').style.top = '80px';
+  document.getElementById('monster-name-label').textContent = monsterName.toUpperCase().slice(0, 10);
+  updateHUD();
+}
+
+function hideHUD() {
+  hud.style.display = 'none';
+  document.getElementById('story-viewport').style.top = '44px';
+}
+
+function updateHUD() {
+  const pPct = Math.max(0, (state.player.hp / state.player.maxHp) * 100);
+  const mPct = Math.max(0, (state.monster ? state.monster.hp / state.monster.maxHp * 100 : 100));
+  document.getElementById('player-bar-fill').style.width  = pPct + '%';
+  document.getElementById('monster-bar-fill').style.width = mPct + '%';
+  document.getElementById('player-hp-label').textContent  = Math.max(0, state.player.hp);
+  document.getElementById('monster-hp-label').textContent = state.monster ? Math.max(0, state.monster.hp) : '?';
+  // Colour the player bar based on HP
+  document.getElementById('player-bar-fill').style.background =
+    pPct > 50 ? '#6adf7e' : pPct > 25 ? '#dfcc6a' : '#df6a6a';
+}
+
+/* ============================================================
+   BACKGROUND
+============================================================ */
+const bgEl = document.getElementById('bg-image');
+
+function setBackground(bg) {
+  bgEl.style.backgroundImage = `url('${bg.path}')`;
+  bgEl.style.opacity = '1';
+}
+
+function clearBackground() {
+  bgEl.style.opacity = '0';
+}
+
+/* ============================================================
+   GAME FLOW
+============================================================ */
+
+function startGame() {
+  const desc = document.getElementById('char-desc-input').value.trim();
+  const level = document.getElementById('char-level-input').value.trim();
+  const race = document.getElementById('char-race-input').value.trim();
+
+  if (!desc) {
+    document.getElementById('char-desc-input').focus();
+    return;
+  }
+  if (!level || isNaN(level) || level < 1) {
+    document.getElementById('char-level-input').focus();
+    return;
+  }
+  if (!race) {
+    document.getElementById('char-race-input').focus();
+    return;
+    }
+  state.playerDesc = desc;
+  state.playerLevel = level;
+  state.playerRace = race;
+  state.phase = 'encounter';
+  document.getElementById('start-menu').style.display = 'none';
+  runEncounterLoop();
+}
+
+document.getElementById('char-desc-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startGame();
+});
+
+async function runEncounterLoop() {
+  setBusy(true);
+  clearBackground();
+
+  // Pick a random background
+  const bg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  state.background = bg;
+
+  // Reset player HP each encounter? Uncomment if desired:
+  // state.player.hp = state.player.maxHp;
+
+  storyLog = '';
+  storyEl.textContent = '';
+
+  setBackground(bg);
+  await delay(300);
+
+  // ── Encounter header ──
+  const encounterNum = state.monstersDefeated + 1;
+  await typeAsync(`\n★ ENCOUNTER ${encounterNum} ★\n`);
+  await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
+  await typeAsync(bg.description + '\n\n');
+
+  // ── Generate monster ──
+  await typeAsync('Something stirs in the dark...\n\n');
+  const monsterPrompt = buildMonsterPrompt(bg, state.monstersDefeated);
+  const monsterData   = await mockLLMResponse(monsterPrompt);
+
+  state.monster = {
+    name: monsterData.name,
+    description: monsterData.description,
+    hp: monsterData.hp,
+    maxHp: monsterData.hp,
+  };
+
+  showHUD(monsterData.name);
+  await typeAsync(monsterData.intro + '\n\n');
+  await typeAsync(`[ ${monsterData.name.toUpperCase()} — ${monsterData.description} ]\n\n`);
+  await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+  state.phase = 'encounter';
+  inputEl.placeholder = 'What do you do?';
+  setBusy(false);
+}
+
+async function handleCombatAction(action) {
   setBusy(true);
 
-  typeWrite(`\n> ${cmd}\n`, () => {
-    const response = mockLLM(cmd);
-    typeWrite(response + '\n', () => {
-      setBusy(false);
-    });
-  });
+  await typeAsync(`\n> ${action}\n\n`);
+
+  const prompt  = buildCombatPrompt(action, state.monster, state.background);
+  const result  = await mockLLMResponse(prompt);
+
+  // Apply damage
+  state.monster.hp -= result.monsterDamage;
+  state.player.hp  -= result.playerDamage;
+  updateHUD();
+
+  await typeAsync(result.narrative + '\n');
+
+  if (result.playerDamage > 0)
+    await typeAsync(`  You take ${result.playerDamage} damage. (HP: ${Math.max(0, state.player.hp)})\n`);
+  if (result.monsterDamage > 0)
+    await typeAsync(`  ${state.monster.name} takes ${result.monsterDamage} damage. (HP: ${Math.max(0, state.monster.hp)})\n`);
+
+  await typeAsync('\n');
+
+  if (result.outcome === 'player_wins' || state.monster.hp <= 0) {
+    await handleVictory();
+  } else if (result.outcome === 'monster_wins' || state.player.hp <= 0) {
+    await handleDeath();
+  } else {
+    setBusy(false);
+  }
+}
+
+async function handleVictory() {
+  state.monstersDefeated++;
+  hideHUD();
+
+  await typeAsync(`★ VICTORY! The ${state.monster.name} has been defeated! ★\n\n`);
+
+  const rewardPrompt = buildRewardPrompt(state.monster, state.background);
+  const reward       = await mockLLMResponse(rewardPrompt);
+
+  state.inventory.push(reward.item);
+
+  await typeAsync(`You search the remains...\n\n`);
+  await typeAsync(`  [ ITEM GAINED ]\n`);
+  await typeAsync(`  ${reward.item}\n`);
+  await typeAsync(`  "${reward.flavour}"\n\n`);
+  await typeAsync(`Your inventory: ${state.inventory.join(' | ')}\n\n`);
+  await typeAsync('Advance to the next encounter...\n');
+
+  state.phase = 'reward';
+  inputEl.placeholder = 'Anything to say to lady death? There will be consequences...';
+
+  setBusy(false);
+}
+
+async function handleDeath() {
+  hideHUD();
+  clearBackground();
+  state.phase = 'dead';
+
+  await typeAsync('\n\n');
+  await typeAsync('★ ★ ★  GAME OVER  ★ ★ ★\n\n');
+  await typeAsync(`Monsters defeated: ${state.monstersDefeated}\n`);
+  await typeAsync(`Items collected:   ${state.inventory.length ? state.inventory.join(', ') : 'none'}\n\n`);
+  await typeAsync('Type RESTART to play again.\n');
+
+  inputEl.placeholder = 'Type RESTART...';
+  setBusy(false);
+}
+
+/* ============================================================
+   INPUT HANDLING
+============================================================ */
+function submitInput() {
+  if (isBusy) return;
+  const raw = inputEl.value.trim();
+  inputEl.value = '';
+  if (!raw) return;
+
+  // ── DEAD state ──
+  if (state.phase === 'dead') {
+    if (raw.toLowerCase() === 'restart') {
+      state.inventory = [];
+      state.monstersDefeated = 0;
+      state.player.hp = state.player.maxHp;
+      state.monster = null;
+      state.phase = 'menu';
+      document.getElementById('char-desc-input').value = '';
+      document.getElementById('start-menu').style.display = 'flex';
+    }
+    return;
+  }
+
+  // ── REWARD / between encounters ──
+  if (state.phase === 'reward') {
+    state.player.hp = state.player.maxHp; // heal between encounters
+    runEncounterLoop();
+    return;
+  }
+
+  // ── COMBAT ──
+  if (state.phase === 'encounter') {
+    handleCombatAction(raw);
+  }
 }
 
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter') submitInput();
 });
 
-/* ================================================
-   BOOT SEQUENCE
-================================================ */
-resetGameState();
-
-const intro = [
-  '★ RETRO ADVENTURE ★\n',
-  '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
-  'You awake in a dim stone chamber.\n',
-  'Dusty air. Cold floor. A single torch flickers on the wall,\n',
-  'revealing a door to the NORTH. A rusty KEY lies on the ground.\n\n',
-  'Commands: look, go [dir], take [item], inventory, help\n\n',
-  '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n',
-];
-
-setBusy(true);
-
-let seq = Promise.resolve();
-intro.forEach(line => {
-  seq = seq.then(() => new Promise(res => typeWrite(line, res)));
-});
-seq.then(() => setBusy(false));
+/* ============================================================
+   HELPERS
+============================================================ */
+function typeAsync(text) {
+  return new Promise(res => typeWrite(text, res));
+}
 </script>
 </body>
 </html>

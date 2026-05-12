@@ -1,0 +1,18 @@
+[
+  {
+    "path": "images/desert_ruins.png",
+    "description": "Ancient sandstone ruins half-buried in endless dunes. The wind whispers forgotten secrets through broken arches."
+  },
+  {
+    "path": "images/tavern.png",
+    "description": "A warm, smoky tavern lit by flickering lanterns. The smell of roasted meat and spilled ale fills the air."
+  },
+  {
+    "path": "images/skypia.png",
+    "description": "Floating islands above a sea of clouds. Waterfalls plunge into the void. Strange birds sing in the thin air."
+  },
+  {
+    "path": "images/enchanted_forest.png",
+    "description": "A forest of glowing mushrooms and silver-leafed trees. Tiny lights dance between the trunks."
+  }
+]
