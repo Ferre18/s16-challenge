@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NEVERENDING ABYSS</title>
+  <title>Language Gauntlet</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -214,72 +214,64 @@
       max-width: 720px;
     }
 
-    #char-desc-label {
-      color: #f2ead3;
-      font-size: 9px;
-      letter-spacing: 1px;
-      text-align: center;
-    }
-    #char-race-label {
-      color: #f2ead3;
-      font-size: 9px;
-      letter-spacing: 1px;
-      text-align: center;
-    }
-    #char-level-label {
-      color: #f2ead3;
-      font-size: 9px;
-      letter-spacing: 1px;
-      text-align: center;
-    }
+    .form-grid {
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 22px;
+}
 
-    #char-desc-input {
-      width: 100%;
-      max-width: 720px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid #f2ead3;
-      color: #f2ead3;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      padding: 8px 6px;
-      outline: none;
-      caret-color: #f2ead3;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(242,234,211,0.5);
-    }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    #char-level-input {
-      width: 100%;
-      max-width: 720px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid #f2ead3;
-      color: #f2ead3;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      padding: 8px 6px;
-      outline: none;
-      caret-color: #f2ead3;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(242,234,211,0.5);
-    }
+.field-full {
+  grid-column: 1 / -1;
+}
 
-    #char-race-input {
-      width: 100%;
-      max-width: 720px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid #f2ead3;
-      color: #f2ead3;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      padding: 8px 6px;
-      outline: none;
-      caret-color: #f2ead3;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(242,234,211,0.5);
-    }
+.field label {
+  color: #f2ead3;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.field input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #f2ead3;
+  color: #f2ead3;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 8px 6px;
+  outline: none;
+  caret-color: #f2ead3;
+  text-align: center;
+  text-shadow: 0 0 5px rgba(242,234,211,0.5);
+}
+
+/* Smaller level box */
+.level-field {
+  max-width: 160px;
+  margin: 0 auto;
+  grid-column: 1 / -1;
+}
+
+/* Optional mobile stacking */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-full {
+    grid-column: auto;
+  }
+}
 
     #char-desc-input::placeholder {
       color: rgba(242,234,211,0.35);
@@ -350,46 +342,68 @@
 
 <div id="screen">
   <div id="bg-image"></div>
-
-  <!-- START MENU -->
-  <!-- START MENU -->
 <div id="start-menu">
-  <h1>★ NEVERENDING ABYSS ★</h1>
+  <h1>★ Language Gauntlet ★</h1>
 
   <p>
-    Face ever-stronger monsters. Survive by wit and spoils.<br/>
+    Face ever-stronger monsters. Survive by wit and spoils.<br />
     Describe your character — the world will remember who you are.
   </p>
 
-  <!-- Character Description -->
-<label id="char-desc-label" for="char-desc-input">WHO ARE YOU?</label>  <input
-    id="char-desc-input"
-    type="text"
-    placeholder="e.g. a cunning rogue with a taste for danger"
-    autocomplete="off"
-    spellcheck="false"
-    maxlength="50"
-  />
+  <div class="form-grid">
 
-  <!-- Race Input -->
-   <label id="char-race-label" for="char-race-input">What is your race?</label>
+    <!-- Description -->
+    <div class="field field-full">
+      <label for="char-desc-input">WHO ARE YOU?</label>
+      <input
+        id="char-desc-input"
+        type="text"
+        placeholder="e.g. a cunning child with a taste for danger"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="50"
+      />
+    </div>
 
-  <input
-    id="char-race-input"
-    type="text"
-    placeholder="e.g. Human, Elf, Construct"
-    autocomplete="off"
-    spellcheck="false"
-    maxlength="10"
-  />
+    <!-- Class -->
+    <div class="field">
+      <label for="char-class-input">CLASS</label>
+      <input
+        id="char-class-input"
+        type="text"
+        placeholder="Warrior"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="8"
+      />
+    </div>
 
-  <!-- Hardcoded Level -->
-<label id="char-level-label" for="char-level-input">What is your level?</label>
-  <input
-    id="char-level-input"
-    type="number"
-    value="1"
-  />
+    <!-- Race -->
+    <div class="field">
+      <label for="char-race-input">RACE</label>
+      <input
+        id="char-race-input"
+        type="text"
+        placeholder="Elf"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="8"
+      />
+    </div>
+
+    <!-- Level -->
+    <div class="field level-field">
+      <label for="char-level-input">LEVEL</label>
+      <input
+        id="char-level-input"
+        type="number"
+        value="1"
+        min="1"
+        max="20"
+      />
+    </div>
+
+  </div>
 
   <button id="start-btn" onclick="startGame()">► BEGIN ◄</button>
 </div>
@@ -405,7 +419,7 @@
     <span class="hud-label" id="monster-hp-label">100</span>
   </div>
 
-  <div id="titlebar">★ NEVERENDING ABYSS v1.0 ★</div>
+  <div id="titlebar">★ Language Gauntlet v1.0 ★</div>
 
   <div id="story-viewport">
     <div id="story-text"></div>
@@ -480,6 +494,8 @@ const state = {
   playerDesc: '',
   playerLevel: '',
   playerRace: '',
+  playerClass: '',
+  playerCharSheet: '',
   inventory: [],
   monstersDefeated: 0,
   background: null,
@@ -526,6 +542,29 @@ Respond with ONLY valid JSON in this exact shape:
 }`;
 }
 
+function buildCharacterPrompt() {
+  return `Role: You are a professional D&D 5th Edition Dungeon Master and Systems Designer. Your task is to translate a character concept into a mechanically accurate 5e character sheet.
+
+  Input Variables:
+Race: ${state.playerRace}
+Class: ${state.playerClass}
+Level: ${state.playerLevel}
+Description: ${state.playerDesc}
+
+Strict Rules for Generation:
+Attributes: Use the Standard Array (15, 14, 13, 12, 10, 8). Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
+Health (HP): Calculate HP based on Level 1 max hit die + (Hit die average for subsequent levels) + (CON modifier * Level).
+Armor Class (AC): Calculate based on the most appropriate starting armor for the class + DEX modifier.
+Initiative: Must equal the DEX modifier.
+Speed: Based on Race (e.g., 30ft for Human, 25ft for Dwarf).
+Proficiency Bonus: Calculated based on Level.
+Skills: Select proficiencies based on the Class and Background that best fits the Description.
+Spells: If the class is a spellcaster, select a thematic "loadout" of Cantrips and Level 1+ spells appropriate for their level and spell slots.
+
+Output Format:
+     You MUST respond only with a valid JSON object following this exact structure: 
+{ "character_metadata": { "race": "string", "class": "string", "subclass": "string", "level": "number", "proficiency_bonus": "number" }, "attributes": { "strength": { "score": "number", "modifier": "number" }, "dexterity": { "score": "number", "modifier": "number" }, "constitution": { "score": "number", "modifier": "number" }, "intelligence": { "score": "number", "modifier": "number" }, "wisdom": { "score": "number", "modifier": "number" }, "charisma": { "score": "number", "modifier": "number" } }, "combat_stats": { "hp_max": "number", "armor_class": "number", "initiative": "number", "speed": "string", "hit_die": "string" }, "skills": [ { "name": "string", "bonus": "number", "is_proficient": "boolean" } ], "spells": { "cantrips": ["string"], "level_1": ["string"], "level_2": ["string"] } } 
+`
 /**
  * PROMPT 2/3 — Ask the LLM to resolve one player action in combat.
  */
@@ -534,6 +573,9 @@ function buildCombatPrompt(playerAction, monster, background) {
 
 SETTING:
 ${background.description}
+
+PLAYER STATS:
+${state.playerDesc} 
 
 PLAYER DESCRIPTION:
 ${state.playerDesc}
@@ -573,6 +615,8 @@ SETTING:
 ${background.description}
 
 PLAYER DESCRIPTION:
+A level ${state.playerLevel}  ${state.playerRace} ${state.playerClass}.
+
 ${state.playerDesc}
 
 PLAYER INVENTORY:
@@ -761,6 +805,7 @@ function startGame() {
   const desc = document.getElementById('char-desc-input').value.trim();
   const level = document.getElementById('char-level-input').value.trim();
   const race = document.getElementById('char-race-input').value.trim();
+  const player_class = document.getElementById('char-class-input').value.trim();
 
   if (!desc) {
     document.getElementById('char-desc-input').focus();
@@ -774,11 +819,19 @@ function startGame() {
     document.getElementById('char-race-input').focus();
     return;
     }
+    if (!player_class) {
+        document.getElementById('char-class-input').focus();
+        return;
+    }   
   state.playerDesc = desc;
   state.playerLevel = level;
   state.playerRace = race;
+  state.playerClass = player_class;
   state.phase = 'encounter';
   document.getElementById('start-menu').style.display = 'none';
+
+  let character_prompt = buildCharacterPrompt();
+  state.playerCharSheet = mockLLMResponse(character_prompt)
   runEncounterLoop();
 }
 
