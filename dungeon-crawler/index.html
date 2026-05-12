@@ -542,6 +542,7 @@ Respond with ONLY valid JSON in this exact shape:
 }`;
 }
 
+
 function buildCharacterPrompt() {
   return `Role: You are a professional D&D 5th Edition Dungeon Master and Systems Designer. Your task is to translate a character concept into a mechanically accurate 5e character sheet.
 
@@ -553,18 +554,13 @@ Description: ${state.playerDesc}
 
 Strict Rules for Generation:
 Attributes: Use the Standard Array (15, 14, 13, 12, 10, 8). Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
-Health (HP): Calculate HP based on Level 1 max hit die + (Hit die average for subsequent levels) + (CON modifier * Level).
 Armor Class (AC): Calculate based on the most appropriate starting armor for the class + DEX modifier.
-Initiative: Must equal the DEX modifier.
-Speed: Based on Race (e.g., 30ft for Human, 25ft for Dwarf).
-Proficiency Bonus: Calculated based on Level.
-Skills: Select proficiencies based on the Class and Background that best fits the Description.
-Spells: If the class is a spellcaster, select a thematic "loadout" of Cantrips and Level 1+ spells appropriate for their level and spell slots.
 
 Output Format:
      You MUST respond only with a valid JSON object following this exact structure: 
-{ "character_metadata": { "race": "string", "class": "string", "subclass": "string", "level": "number", "proficiency_bonus": "number" }, "attributes": { "strength": { "score": "number", "modifier": "number" }, "dexterity": { "score": "number", "modifier": "number" }, "constitution": { "score": "number", "modifier": "number" }, "intelligence": { "score": "number", "modifier": "number" }, "wisdom": { "score": "number", "modifier": "number" }, "charisma": { "score": "number", "modifier": "number" } }, "combat_stats": { "hp_max": "number", "armor_class": "number", "initiative": "number", "speed": "string", "hit_die": "string" }, "skills": [ { "name": "string", "bonus": "number", "is_proficient": "boolean" } ], "spells": { "cantrips": ["string"], "level_1": ["string"], "level_2": ["string"] } } 
-`
+{ "character_metadata": { "race": "string", "class": "string", "level": "number" }, "attributes": { "strength": "number", "dexterity": "number", "constitution": "number", "intelligence": "number", "wisdom": "number", "charisma": "number"}, "armor_class": "number" } 
+`;
+}
 /**
  * PROMPT 2/3 — Ask the LLM to resolve one player action in combat.
  */
@@ -831,7 +827,8 @@ function startGame() {
   document.getElementById('start-menu').style.display = 'none';
 
   let character_prompt = buildCharacterPrompt();
-  state.playerCharSheet = mockLLMResponse(character_prompt)
+  mockLLMResponse(character_prompt);
+//   state.playerCharSheet = mockLLMResponse(character_prompt)
   runEncounterLoop();
 }
 
