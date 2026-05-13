@@ -1370,7 +1370,11 @@ function submitInput() {
   if (isBusy) return;
   const raw = inputEl.value.trim();
   inputEl.value = '';
-  if (!raw) return;
+
+  if (state.phase === 'reward') {
+    runEncounterLoop();
+    return;
+  }
 
   if (state.phase === 'dead') {
     if (raw.toLowerCase() === 'restart') {
@@ -1381,10 +1385,8 @@ function submitInput() {
     return;
   }
 
-  if (state.phase === 'reward') {
-    runEncounterLoop();
-    return;
-  }
+
+  if (!raw) return;
 
   if (state.phase === 'encounter') {
     handleCombatAction(raw);
