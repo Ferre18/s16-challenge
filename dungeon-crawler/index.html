@@ -878,6 +878,91 @@ function typeAsync(text) {
   return new Promise(res => typeWrite(text, res));
 }
 
+
+/* ============================================================
+   MUSIC MANAGER
+============================================================ */
+const music = (() => {
+  const tracks = {
+    standard: [
+      'standard_battle_1.wav',
+      'standard_battle_2.wav',
+      'standard_battle_3.wav',
+      'standard_battle_4.wav',
+      'standard_battle_5.wav',
+    ],
+    boss: [
+      'boss_battle_1.wav',
+      'boss_battle_2.wav',
+      'boss_battle_3.wav',
+    ],
+  };
+
+  // Track last played index per type
+  const lastPlayed = {
+    standard: -1,
+    boss: -1,
+  };
+
+  let audio = null;
+  let currentType = null;
+
+  function getRandomTrack(type) {
+    const list = tracks[type];
+    if (!list || !list.length) return null;
+
+    // If only one track exists, use it
+    if (list.length === 1) {
+      return `/music/${type}/${list[0]}`;
+    }
+
+    let index;
+
+    // Keep rolling until different from previous
+    do {
+      index = Math.floor(Math.random() * list.length);
+    } while (index === lastPlayed[type]);
+
+    lastPlayed[type] = index;
+
+    return `/music/${type}/${list[index]}`;
+  }
+
+  function play(type) {
+    stop();
+
+    const src = getRandomTrack(type);
+    if (!src) return;
+
+    currentType = type;
+
+    audio = new Audio(src);
+    audio.volume = 0.5;
+
+    // Play another random track when finished
+    audio.onended = () => play(type);
+
+    audio.play().catch(e => {
+      console.warn('Music play failed:', e);
+    });
+  }
+
+  function stop() {
+    if (audio) {
+      audio.onended = null;
+      audio.pause();
+      audio.src = '';
+      audio = null;
+    }
+
+    currentType = null;
+  }
+
+  return { play, stop };
+})();
+
+
+
 /* ============================================================
    HUD
 ============================================================ */
@@ -1059,6 +1144,8 @@ async function runEncounterLoop() {
   setBackground(biome);
   await delay(400);
 
+  music.play(isBoss ? 'boss' : 'standard');
+
   const encounterNum = state.world.encounterIndex + 1;
   await typeAsync(`\n${isBoss ? `★★ BOSS ENCOUNTER - ${biome.name.toUpperCase()} ★★` : `★ ENCOUNTER ${encounterNum} - ${biome.name.toUpperCase()} ★`}\n`);
   await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
@@ -1207,7 +1294,7 @@ async function handleCombatAction(action) {
 
 async function handleVictory() {
   hideHUD();
-
+  music.stop();
   const monster = state.monster;
   const biome   = state.world.biome;
   const isBoss  = state.world.encounterIndex >= state.world.totalEncounters - 1;
@@ -1264,7 +1351,7 @@ async function handleDeath() {
   hideHUD();
   clearBackground();
   state.phase = 'dead';
-
+  music.stop();
   await typeAsync('\n\n');
   await typeAsync('★ ★ ★  GAME OVER  ★ ★ ★\n\n');
   await typeAsync(`You fell to the ${state.monster.name}.\n`);
