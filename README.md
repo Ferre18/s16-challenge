@@ -27,3 +27,17 @@ Yeray
  Task   | Prompt | Purpose |
 | ------ | ----- | ----- | 
 | Task | Person | Purpose |
+
+
+# Installation guide
+
+Install ollama and Node.js
+Run 
+```
+ollama pull deepseek-1r:1.5b # Different model if you change the serve.js model 
+```
+In the terminal, travel to /dungeon-crawler and Run
+```
+npm install
+node server.js
+```

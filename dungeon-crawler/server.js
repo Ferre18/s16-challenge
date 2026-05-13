@@ -64,6 +64,7 @@ app.post('/api/llm', async (req, res) => {
         // model: 'deepseek-r1:8b', // pick your local variant
         model: 'deepseek-r1:1.5b', // pick your local variant
         // model: 'qwen3:4b', // pick your local variant
+        // model: 'gemma4:e2b', // pick your local variant
         messages: [
           {
             role: 'user',
