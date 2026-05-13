@@ -605,6 +605,7 @@ function getDifficultyTier(difficulty) {
 
 function buildMonsterPrompt(isBoss) {
   const biome = state.world.biome;
+  state.monster.maxHp = isBoss ? Math.min(60 + difficulty * 10, 120) : Math.min(30 + difficulty * 12, 80);
   const difficulty = Math.max(3 * state.world.biomeHistory.length - 1 + state.world.encounterIndex, 0);
   const tier = getDifficultyTier(difficulty);
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
