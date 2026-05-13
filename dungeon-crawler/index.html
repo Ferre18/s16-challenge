@@ -542,7 +542,8 @@ const state = {
   world: {
     biome: null,
     encounterIndex: 0,
-    totalEncounters: 4, // 3 normal + 1 boss
+    totalEncounters: 3,
+    biomeHistory: []
   },
   // Monster
   monster: null,
@@ -576,16 +577,43 @@ You MUST respond only with a valid JSON object following this exact structure:
 { "strength": "score", "dexterity": "score", "constitution": "score", "intelligence": "score", "wisdom": "score", "charisma": "score", "armor_class": "score" }`;
 }
 
+
+function getNextBiome() {
+  let biome;
+
+  do {
+    biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  } while (biome === state.world.biome && backgrounds.length > 1);
+
+  return biome;
+}
+
+
+const DIFFICULTY_TIERS = [
+  { max: 0,  label: 'Trivial',     desc: 'A weak, unthreatening creature. Almost no danger.' },
+  { max: 2,  label: 'Easy',        desc: 'A common threat. Manageable for a prepared adventurer.' },
+  { max: 5,  label: 'Moderate',    desc: 'A seasoned fighter. Requires thought and tactics.' },
+  { max: 9,  label: 'Hard',        desc: 'A dangerous, battle-hardened creature. Punishes mistakes.' },
+  { max: 14, label: 'Very Hard',   desc: 'A fearsome predator. Few survive without preparation.' },
+  { max: 20, label: 'Brutal',      desc: 'A legendary threat. Only the exceptional endure.' },
+  { max: Infinity, label: 'Nightmare', desc: 'An apex horror. Victory seems impossible.' },
+];
+
+function getDifficultyTier(difficulty) {
+  return DIFFICULTY_TIERS.find(t => difficulty <= t.max);
+}
+
 function buildMonsterPrompt(isBoss) {
   const biome = state.world.biome;
-  const difficulty = state.world.encounterIndex;
+  const difficulty = max(3 * state.world.biomeHistory.length - 1 + state.world.encounterIndex, 0);
+  const tier = getDifficultyTier(difficulty);
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
 Generate a complete enemy profile for the player to face. The rewards should be based on the monster, but be usable against other monsters.
 
 Parameters:
 - Biome/Environment: ${biome.name} — ${biome.description}
-- Difficulty: ${difficulty} encounters completed so far
+- Difficulty: ${tier.label} — ${tier.desc}
 - Is_boss: ${isBoss ? 'Yes' : 'No'}
 - Character class: ${state.player.class}
 - Character description: ${state.player.description}
@@ -1052,9 +1080,15 @@ function startGame() {
   state.player.hp          = 100;
   state.player.maxHp       = 100;
   state.player.inventory   = [];
+  state.world.biomeHistory = [];
   state.player.statusEffect = '';
-  state.world.encounterIndex = 0;
-  state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  state.world.encounterIndex = state.world.encounterIndex || 0;
+
+  if (!state.world.biome || state.world.encounterIndex === 0) {
+    state.world.biome = state.world.biome
+      ? getNextBiome()
+      : backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  }
   state.combat.historyLog = [];
 
   document.getElementById('start-menu').style.display = 'none';
@@ -1340,8 +1374,13 @@ async function handleVictory() {
       state.phase = 'dead';
       setBusy(false);
     } else {
-      state.world.encounterIndex++;
-      state.phase = 'reward';
+      state.world.encounterIndex = state.world.encounterIndex || 0;
+
+      if (!state.world.biome || state.world.encounterIndex === 0) {
+        state.world.biome = state.world.biome
+          ? getNextBiome()
+          : backgrounds[Math.floor(Math.random() * backgrounds.length)];
+      }
       inputEl.placeholder = 'Press ENTER to advance...';
       setBusy(false);
     }

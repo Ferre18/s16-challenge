@@ -55,16 +55,17 @@ app.use(express.static('.'));
 
 app.post('/api/llm', async (req, res) => {
   try {
-    const ollamaRes = await fetch('http://localhost:11434/api/chat', {
+    const ollamaRes = await fetch('http://100.75.17.119:11434/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         // model: 'deepseek-r1:8b', // pick your local variant
-        model: 'deepseek-r1:1.5b', // pick your local variant
+        // model: 'deepseek-r1:1.5b', // pick your local variant
         // model: 'qwen3:4b', // pick your local variant
         // model: 'gemma4:e2b', // pick your local variant
+        model: 'gemma',
         messages: [
           {
             role: 'user',
