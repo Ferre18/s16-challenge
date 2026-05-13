@@ -549,7 +549,7 @@ Armor Class (AC): Calculate based on the most appropriate starting armor for the
 
 Output Format:
 You MUST respond only with a valid JSON object following this exact structure:
-{ "character_metadata": { "race": "string", "class": "string", "level": "number" }, "attributes": { "strength": "number", "dexterity": "number", "constitution": "number", "intelligence": "number", "wisdom": "number", "charisma": "number" }, "armor_class": "number" }`;
+{ "strength": "score", "dexterity": "score", "constitution": "score", "intelligence": "score", "wisdom": "score", "charisma": "score", "armor_class": "score" }`;
 }
 
 function buildMonsterPrompt(isBoss) {
@@ -557,12 +557,14 @@ function buildMonsterPrompt(isBoss) {
   const difficulty = state.world.encounterIndex;
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
-Generate a complete enemy profile for the player to face.
+Generate a complete enemy profile for the player to face. The rewards should be based on the monster, but be usable against other monsters.
 
 Parameters:
 - Biome/Environment: ${biome.name} — ${biome.description}
 - Difficulty: ${difficulty} encounters completed so far
 - Is_boss: ${isBoss ? 'Yes' : 'No'}
+- Character class: ${state.player.class}
+- Character description: ${state.player.description}
 
 CRITICAL INSTRUCTION: Output ONLY valid JSON. No markdown, no extra text.
 
@@ -593,21 +595,17 @@ Objective: Narrate the current scene. Immerse the player in the environment and 
 
 1. Environmental Sensory Input
 - Describe lighting, architecture, atmosphere using the biome.
-- Describe how air feels and what the player hears or smells.
 - Filter description through the player's class and race (e.g., a Rogue notices lack of footprints; a Paladin notices desecration).
+- Describe how the monster appears and the general appearance.
 
-2. The Obfuscated Threat
-- Do NOT name the enemy. Use only effects, vague silhouettes, shadows, sounds.
-- Describe environmental displacement (reeds parting, a heavy musk, a sound of grinding bone).
-
-3. End the narration at the "beat" before combat begins — the moment tension peaks.
+2. End the narration at the "beat" before combat begins — the moment tension peaks.
 
 INPUTS:
 Player: Level ${player.level} ${player.race} ${player.class} — "${player.description}" — carrying: ${player.inventory.length ? player.inventory.map(i=>i.item_name).join(', ') : 'nothing'}
 Biome: ${biome.name} — ${biome.description} — Mood: ${biome.mood}
 Enemy hints (do NOT name it): ${monster.description}
 
-Respond with ONLY the narration text, 3-5 sentences, no JSON, no labels.`;
+Respond with ONLY the narration text, 3-5 sentences, no JSON, no labels. Do not think, just improvise.`;
 }
 
 function buildValidationPrompt(playerAction) {
@@ -636,7 +634,7 @@ INPUTS:
 - Recent combat history:\n${recentHistory || 'none yet'}
 
 VALIDATION RULES:
-1. The action must be physically and narratively possible within the established fantasy setting.
+1. Attempting the action must be physically and narratively possible within the established fantasy setting.
 2. Player CANNOT use items not in their inventory.
 3. Player CANNOT cast spells or use powers not supported by their class/attributes.
 4. Player CAN use held items creatively, describe physical actions, improvise with the environment.
@@ -644,9 +642,13 @@ VALIDATION RULES:
 6. Reject actions that contradict prior round summaries.
 7. Assume medieval fantasy setting unless context states otherwise.
 
-OUTPUT RULES:
-- Return ONLY: true or false
-- No explanations. No JSON. No markdown. No extra text.`;
+OUTPUT FORMAT — Return ONLY this JSON:
+{
+  "reason": "Short reason for the validation decision",
+  "valid": true | false,
+}
+
+IMPORTANT: Output must be valid JSON only. No markdown. No explanations outside the JSON.`;
 }
 
 function buildCombatPrompt(playerAction) {
@@ -695,7 +697,7 @@ COMBAT RULES:
 
 OUTPUT FORMAT — Return ONLY this JSON:
 {
-  "outcome": "short immersive narration",
+  "outcome": "Short immersive narration of the result of the player's action and the enemy's response",
   "damage_dealt": integer,
   "damage_received": integer,
   "status": "status effect name or empty string",
@@ -736,7 +738,7 @@ Respond with ONLY narration text, 3-5 sentences. No JSON, no labels, no markdown
 async function llmResponse(prompt) {
   console.groupCollapsed('[LLM PROMPT]');
   console.log(prompt);
-  
+  console.groupEnd();
 
   let attempts = 0;
 
@@ -749,9 +751,6 @@ async function llmResponse(prompt) {
   });
 
   const data = await res.json();
-  console.log('LLM response:', data);
-  console.groupEnd();
-
   if (!res.ok) {
     console.error('API error:', data);
     throw new Error(data.error?.message || 'API failed');
@@ -963,20 +962,53 @@ async function generateCharacterSheet() {
     const prompt = buildCharacterPrompt();
     const sheet = await llmJSON(prompt);
     // Apply attributes and AC from sheet
-    if (sheet.attributes) {
+    console.groupCollapsed('Generated Sheet');
+    console.dir(sheet, { depth: null });
+    console.groupEnd();
+
+    // Apply attributes and AC from sheet
+    if (sheet) {
+      const previousAttributes = { ...state.player.attributes };
+
       state.player.attributes = {
-        strength:     sheet.attributes.strength     || 10,
-        dexterity:    sheet.attributes.dexterity    || 10,
-        constitution: sheet.attributes.constitution || 10,
-        intelligence: sheet.attributes.intelligence || 10,
-        wisdom:       sheet.attributes.wisdom       || 10,
-        charisma:     sheet.attributes.charisma     || 10,
+        strength:     sheet.strength     || 10,
+        dexterity:    sheet.dexterity    || 10,
+        constitution: sheet.constitution || 10,
+        intelligence: sheet.intelligence || 10,
+        wisdom:       sheet.wisdom       || 10,
+        charisma:     sheet.charisma     || 10,
       };
+
+      console.groupCollapsed('Attributes Applied');
+      console.table({
+        previous: previousAttributes,
+        generated: sheet,
+        final: state.player.attributes,
+      });
+      console.groupEnd();
+    } else {
+      console.warn('No attributes returned from character sheet');
     }
-    if (sheet.armor_class) state.player.armor_class = sheet.armor_class;
-    console.log('[Character Sheet]', sheet);
-  } catch(e) {
+
+    if (sheet.armor_class) {
+      const previousAC = state.player.armor_class;
+      state.player.armor_class = sheet.armor_class;
+
+      console.log('Armor Class Updated', {
+        previous: previousAC,
+        generated: sheet.armor_class,
+        final: state.player.armor_class,
+      });
+    } else {
+      console.warn('No armor_class returned from character sheet');
+    }
+
+    console.groupEnd();
+
+  } catch (e) {
+    console.groupCollapsed('%c[Character Generation Failed]', 'color:#ef4444;font-weight:bold');
     console.warn('Character sheet generation failed, using defaults:', e);
+    console.groupEnd();
   }
 }
 
@@ -1005,12 +1037,11 @@ async function runEncounterLoop() {
   await delay(400);
 
   const encounterNum = state.world.encounterIndex + 1;
-  await typeAsync(`\n${isBoss ? '★★ BOSS ENCOUNTER ★★' : `★ ENCOUNTER ${encounterNum} ★`}\n`);
+  await typeAsync(`\n${isBoss ? `★★ BOSS ENCOUNTER - ${biome.name.toUpperCase()} ★★` : `★ ENCOUNTER ${encounterNum} - ${biome.name.toUpperCase()} ★`}\n`);
   await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
-  await typeAsync(`${biome.name.toUpperCase()}\n\n`);
 
   // Generate monster
-  await typeAsync('Something stirs in the dark...\n\n');
+  await typeAsync('You press onwards...\n\n');
   let monsterData;
   try {
     const prompt = buildMonsterPrompt(isBoss);
@@ -1050,7 +1081,18 @@ async function runEncounterLoop() {
   let narration = '';
   try {
     narration = await llmResponse(buildRoomNarrationPrompt());
-    narration = narration.replace(/```[\s\S]*?```/g, '').trim();
+  narration = narration
+    // Remove markdown code blocks
+    .replace(/```[\s\S]*?```/g, '')
+
+    // Remove <think>...</think> blocks
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+
+    // Remove common "Thinking..." style prefixes
+    .replace(/^\s*thinking\.\.\..*$/gim, '')
+    .replace(/^\s*thoughts?:.*$/gim, '')
+
+    .trim();
   } catch(e) {
     narration = monsterData.intro;
   }
@@ -1060,9 +1102,7 @@ async function runEncounterLoop() {
   await typeAsync(`[ ${monsterData.name.toUpperCase()} ]`);
   if (isBoss) await typeAsync(' ⚠ BOSS');
   await typeAsync(`\n`);
-  await typeAsync(`Weaknesses: ${state.monster.weaknesses.join(', ')}\n`);
-  await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-
+  
   state.phase = 'encounter';
   inputEl.placeholder = 'What do you do?';
   setBusy(false);
@@ -1075,19 +1115,19 @@ async function handleCombatAction(action) {
 
   // ── VALIDATION ──
   let isValid = true;
+  let reason = '';  
   try {
     const validationPrompt = buildValidationPrompt(action);
-    const validationRaw    = await llmResponse(validationPrompt);
-    const cleaned          = validationRaw.trim().toLowerCase();
-    isValid = cleaned.startsWith('true');
+    const validationData    = await llmJSON(validationPrompt);
+    isValid = validationData.valid === true;
+    reason = validationData.reason || 'No reason provided';
   } catch(e) {
     console.warn('Validation failed, defaulting to valid:', e);
     isValid = true;
   }
 
   if (!isValid) {
-    await typeAsync('⚠ That action is not possible in your current situation.\n');
-    await typeAsync('  Consider your inventory, class abilities, and the environment.\n\n');
+    await typeAsync(`⚠ ${reason}\n\n`);
     setBusy(false);
     return;
   }
