@@ -632,6 +632,84 @@ Respond with ONLY valid JSON in this exact shape:
 }
 
 /* ============================================================
+   REAL LLM RESPONSE
+   ----------------------------------------------------------
+   Receives the prompt string (for inspection/logging),
+   returns a parsed JS object matching the expected JSON shape.
+   Replace this entire function body with a real fetch() call.
+*/
+async function llmResponse(prompt) {
+  console.groupCollapsed('[LLM PROMPT]');
+  console.log(prompt);
+  console.log('Calling endpoint...');
+  console.groupEnd();
+
+  const res = await fetch('/api/llm', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt }),
+  });
+
+  const data = await res.json();
+
+  console.log('FULL SERVER RESPONSE:', data);
+
+  if (!res.ok) {
+    console.error('Backend error:', data);
+    throw new Error(data.error || 'Backend failed');
+  }
+
+  const rawText = data.choices?.[0]?.message?.content;
+  if (!rawText) {
+    throw new Error('LLM returned no content');
+  }
+
+  console.groupCollapsed('[LLM RAW OUTPUT]');
+  console.log(rawText);
+  console.groupEnd();
+
+  const cleanedText = rawText
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .trim();
+
+  return parseJsonWithRetries(cleanedText, 3);
+}
+
+function parseJsonWithRetries(text, maxRetries = 3) {
+  let lastError = null;
+  let candidate = text;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return JSON.parse(candidate);
+    } catch (err) {
+      lastError = err;
+
+      const start = candidate.indexOf('{');
+      const end = candidate.lastIndexOf('}');
+
+      if (start !== -1 && end !== -1 && end > start) {
+        candidate = candidate.slice(start, end + 1);
+        try {
+          return JSON.parse(candidate);
+        } catch (err2) {
+          lastError = err2;
+        }
+      }
+
+      candidate = candidate
+        .replace(/^[\s\S]*?(\{)/, '$1')
+        .replace(/(\})[\s\S]*$/, '$1')
+        .trim();
+    }
+  }
+
+  console.error('Invalid JSON after retries:', text);
+  throw lastError || new Error('Invalid JSON');
+}
+/* ============================================================
    MOCK LLM RESPONSE
    ----------------------------------------------------------
    Receives the prompt string (for inspection/logging),
@@ -798,27 +876,23 @@ function clearBackground() {
 ============================================================ */
 
 function startGame() {
-  const desc = document.getElementById('char-desc-input').value.trim();
-  const level = document.getElementById('char-level-input').value.trim();
-  const race = document.getElementById('char-race-input').value.trim();
-  const player_class = document.getElementById('char-class-input').value.trim();
+  let desc = document.getElementById('char-desc-input').value.trim();
+  let level = document.getElementById('char-level-input').value.trim();
+  let race = document.getElementById('char-race-input').value.trim();
+  let player_class = document.getElementById('char-class-input').value.trim();
 
   if (!desc) {
-    document.getElementById('char-desc-input').focus();
-    return;
+    desc = "Normal person"
   }
   if (!level || isNaN(level) || level < 1) {
-    document.getElementById('char-level-input').focus();
-    return;
+    level
   }
   if (!race) {
-    document.getElementById('char-race-input').focus();
-    return;
-    }
-    if (!player_class) {
-        document.getElementById('char-class-input').focus();
-        return;
-    }   
+    race = "Human"
+  }
+  if (!player_class) {
+    player_class = "Warrior"
+  }   
   state.playerDesc = desc;
   state.playerLevel = level;
   state.playerRace = race;
@@ -827,7 +901,7 @@ function startGame() {
   document.getElementById('start-menu').style.display = 'none';
 
   let character_prompt = buildCharacterPrompt();
-  mockLLMResponse(character_prompt);
+  llmResponse(character_prompt);
 //   state.playerCharSheet = mockLLMResponse(character_prompt)
   runEncounterLoop();
 }
