@@ -16,7 +16,6 @@
       font-family: 'Press Start 2P', monospace;
     }
 
-    /* ── Outer CRT shell ── */
     #screen {
       position: relative;
       width: 800px;
@@ -30,7 +29,6 @@
       overflow: hidden;
     }
 
-    /* CRT scanline overlay */
     #screen::before {
       content: '';
       pointer-events: none;
@@ -46,7 +44,6 @@
       );
     }
 
-    /* CRT phosphor glow vignette */
     #screen::after {
       content: '';
       pointer-events: none;
@@ -56,7 +53,6 @@
       background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
     }
 
-    /* ── Background image layer ── */
     #bg-image {
       position: absolute;
       inset: 0;
@@ -67,7 +63,6 @@
       opacity: 0;
       transition: opacity 1.2s ease;
     }
-    /* Dark overlay so text stays readable over any image */
     #bg-image::after {
       content: '';
       position: absolute;
@@ -75,7 +70,6 @@
       background: rgba(0,0,0,0.62);
     }
 
-    /* ── Title bar ── */
     #titlebar {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -92,7 +86,6 @@
       text-shadow: 0 0 8px #f2ead3;
     }
 
-    /* ── Story viewport ── */
     #story-viewport {
       position: absolute;
       top: 44px;
@@ -114,7 +107,6 @@
       word-break: break-word;
     }
 
-    /* ── Input row ── */
     #input-row {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -183,7 +175,7 @@
       pointer-events: none;
     }
 
-    /* ── START MENU overlay ── */
+    /* ── START MENU ── */
     #start-menu {
       position: absolute;
       inset: 0;
@@ -193,13 +185,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 28px;
-      padding: 40px;
+      gap: 20px;
+      padding: 30px 40px;
     }
 
     #start-menu h1 {
       color: #f2ead3;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing: 4px;
       text-shadow: 0 0 16px #f2ead3;
       text-align: center;
@@ -208,84 +200,54 @@
 
     #start-menu p {
       color: rgba(242,234,211,0.7);
-      font-size: 9px;
+      font-size: 8px;
       text-align: center;
       line-height: 2.2;
-      max-width: 720px;
+      max-width: 640px;
     }
 
     .form-grid {
-  width: 100%;
-  max-width: 720px;
-  margin: 20px auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 22px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.field-full {
-  grid-column: 1 / -1;
-}
-
-.field label {
-  color: #f2ead3;
-  font-size: 9px;
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-.field input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #f2ead3;
-  color: #f2ead3;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  padding: 8px 6px;
-  outline: none;
-  caret-color: #f2ead3;
-  text-align: center;
-  text-shadow: 0 0 5px rgba(242,234,211,0.5);
-}
-
-/* Smaller level box */
-.level-field {
-  max-width: 160px;
-  margin: 0 auto;
-  grid-column: 1 / -1;
-}
-
-/* Optional mobile stacking */
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .field-full {
-    grid-column: auto;
-  }
-}
-
-    #char-desc-input::placeholder {
-      color: rgba(242,234,211,0.35);
-      font-size: 9px;
+      width: 100%;
+      max-width: 660px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
     }
 
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field-full { grid-column: 1 / -1; }
+
+    .field label {
+      color: #f2ead3;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .field input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #f2ead3;
+      color: #f2ead3;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      padding: 7px 6px;
+      outline: none;
+      caret-color: #f2ead3;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(242,234,211,0.5);
+    }
+
+    .level-field { max-width: 140px; margin: 0 auto; grid-column: 1 / -1; }
+
     #start-btn {
-      margin-top: 8px;
       background: transparent;
       border: 2px solid #f2ead3;
       color: #f2ead3;
       font-family: 'Press Start 2P', monospace;
       font-size: 11px;
-      padding: 10px 24px;
+      padding: 9px 22px;
       cursor: pointer;
       letter-spacing: 2px;
       text-shadow: 0 0 8px #f2ead3;
@@ -298,7 +260,7 @@
       box-shadow: 0 0 20px rgba(242,234,211,0.45);
     }
 
-    /* ── HP bars ── */
+    /* ── HUD ── */
     #hud {
       position: absolute;
       top: 44px; left: 0; right: 0;
@@ -336,77 +298,142 @@
 
     #player-bar-fill { background: #6adf7e; }
     #monster-bar-fill { background: #df6a6a; }
+
+    /* ── REWARD OVERLAY ── */
+    #reward-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 160;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 30px;
+    }
+
+    #reward-overlay h2 {
+      color: #f2ead3;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 12px #f2ead3;
+      text-align: center;
+    }
+
+    #reward-overlay p.sub {
+      color: rgba(242,234,211,0.6);
+      font-size: 8px;
+      text-align: center;
+      line-height: 2;
+    }
+
+    .reward-cards {
+      display: flex;
+      gap: 14px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .reward-card {
+      flex: 1;
+      max-width: 200px;
+      border: 2px solid rgba(242,234,211,0.5);
+      padding: 12px 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reward-card:hover {
+      border-color: #f2ead3;
+      background: rgba(242,234,211,0.07);
+      box-shadow: 0 0 14px rgba(242,234,211,0.3);
+    }
+
+    .reward-card .r-rarity {
+      color: rgba(242,234,211,0.5);
+      font-size: 7px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .reward-card .r-name {
+      color: #f2ead3;
+      font-size: 8px;
+      line-height: 1.7;
+      text-shadow: 0 0 6px rgba(242,234,211,0.4);
+    }
+
+    .reward-card .r-desc {
+      color: rgba(242,234,211,0.65);
+      font-size: 7px;
+      line-height: 1.8;
+    }
+
+    .reward-card .r-flavour {
+      color: rgba(242,234,211,0.4);
+      font-size: 6px;
+      font-style: italic;
+      line-height: 1.8;
+      border-top: 1px solid rgba(242,234,211,0.2);
+      padding-top: 6px;
+    }
+
+    /* ── STATUS CHIP ── */
+    .status-chip {
+      display: inline-block;
+      border: 1px solid #df9f6a;
+      color: #df9f6a;
+      font-size: 7px;
+      padding: 2px 6px;
+      margin-left: 6px;
+      text-shadow: 0 0 4px #df9f6a;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
 
 <div id="screen">
   <div id="bg-image"></div>
-<div id="start-menu">
-  <h1>★ Language Gauntlet ★</h1>
 
-  <p>
-    Face ever-stronger monsters. Survive by wit and spoils.<br />
-    Describe your character — the world will remember who you are.
-  </p>
+  <!-- START MENU -->
+  <div id="start-menu">
+    <h1>★ Language Gauntlet ★</h1>
+    <p>Face ever-stronger monsters. Survive by wit and spoils.<br/>Your actions are validated — only the coherent survive.</p>
 
-  <div class="form-grid">
-
-    <!-- Description -->
-    <div class="field field-full">
-      <label for="char-desc-input">WHO ARE YOU?</label>
-      <input
-        id="char-desc-input"
-        type="text"
-        placeholder="e.g. a cunning child with a taste for danger"
-        autocomplete="off"
-        spellcheck="false"
-        maxlength="50"
-      />
+    <div class="form-grid">
+      <div class="field field-full">
+        <label for="char-desc-input">WHO ARE YOU?</label>
+        <input id="char-desc-input" type="text" placeholder="e.g. a cunning child with a taste for danger" autocomplete="off" spellcheck="false" maxlength="60"/>
+      </div>
+      <div class="field">
+        <label for="char-class-input">CLASS</label>
+        <input id="char-class-input" type="text" placeholder="Warrior" autocomplete="off" spellcheck="false" maxlength="12"/>
+      </div>
+      <div class="field">
+        <label for="char-race-input">RACE</label>
+        <input id="char-race-input" type="text" placeholder="Elf" autocomplete="off" spellcheck="false" maxlength="12"/>
+      </div>
+      <div class="field level-field">
+        <label for="char-level-input">LEVEL</label>
+        <input id="char-level-input" type="number" value="1" min="1" max="20"/>
+      </div>
     </div>
 
-    <!-- Class -->
-    <div class="field">
-      <label for="char-class-input">CLASS</label>
-      <input
-        id="char-class-input"
-        type="text"
-        placeholder="Warrior"
-        autocomplete="off"
-        spellcheck="false"
-        maxlength="8"
-      />
-    </div>
-
-    <!-- Race -->
-    <div class="field">
-      <label for="char-race-input">RACE</label>
-      <input
-        id="char-race-input"
-        type="text"
-        placeholder="Elf"
-        autocomplete="off"
-        spellcheck="false"
-        maxlength="8"
-      />
-    </div>
-
-    <!-- Level -->
-    <div class="field level-field">
-      <label for="char-level-input">LEVEL</label>
-      <input
-        id="char-level-input"
-        type="number"
-        value="1"
-        min="1"
-        max="20"
-      />
-    </div>
-
+    <button id="start-btn" onclick="startGame()">► BEGIN ◄</button>
   </div>
 
-  <button id="start-btn" onclick="startGame()">► BEGIN ◄</button>
-</div>
+  <!-- REWARD OVERLAY -->
+  <div id="reward-overlay">
+    <h2>★ CHOOSE YOUR REWARD ★</h2>
+    <p class="sub">One item to carry forward. Choose wisely.</p>
+    <div class="reward-cards" id="reward-cards"></div>
+  </div>
 
   <!-- HUD -->
   <div id="hud">
@@ -419,7 +446,7 @@
     <span class="hud-label" id="monster-hp-label">100</span>
   </div>
 
-  <div id="titlebar">★ Language Gauntlet v1.0 ★</div>
+  <div id="titlebar">★ Language Gauntlet v2.0 ★</div>
 
   <div id="story-viewport">
     <div id="story-text"></div>
@@ -427,222 +454,291 @@
 
   <div id="input-row">
     <span id="prompt-arrow">▶</span>
-    <input id="player-input" type="text" placeholder="What do you do?" autocomplete="off" spellcheck="false" />
+    <input id="player-input" type="text" placeholder="What do you do?" autocomplete="off" spellcheck="false"/>
     <button id="submit-btn" onclick="submitInput()">ENTER</button>
   </div>
 </div>
 
 <script>
 /* ============================================================
-   backgrounds JSON
-   Add more entries here — the game picks one at random per encounter.
-   Each entry: { path, description }
-   'path' can be a URL or relative path to an image.
+   BACKGROUNDS
 ============================================================ */
-let backgrounds = [
+const backgrounds = [
   {
     path: 'https://images.unsplash.com/photo-1518562180175-34a163b1a9a6?w=800&q=80',
-    description: 'A damp stone cavern lit by phosphorescent moss. Dripping water echoes from unseen depths. The air smells of iron and old bones.'
+    name: 'Sunken Catacombs',
+    description: 'A damp stone cavern lit by phosphorescent moss. Dripping water echoes from unseen depths. The air smells of iron and old bones.',
+    mood: 'oppressive and damp'
   },
   {
     path: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
-    description: 'A dense, twisted forest where the canopy blots out all sunlight. Gnarled roots claw at the ground like frozen fingers. Something large moves between the trees.'
+    name: 'Twisted Forest',
+    description: 'A dense, twisted forest where the canopy blots out all sunlight. Gnarled roots claw at the ground like frozen fingers. Something large moves between the trees.',
+    mood: 'dark and primal'
   },
   {
     path: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
-    description: 'A jagged mountain pass scoured by freezing winds. Ice coats every surface. Far below, the valley is hidden by cloud.'
+    name: 'Frozen Pass',
+    description: 'A jagged mountain pass scoured by freezing winds. Ice coats every surface. Far below, the valley is hidden by cloud.',
+    mood: 'brutal and isolating'
   },
   {
     path: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&q=80',
-    description: 'The smouldering rim of a volcanic crater. Rivers of lava carve orange veins through black rock. The heat is almost unbearable.'
+    name: 'Volcanic Crater',
+    description: 'The smouldering rim of a volcanic crater. Rivers of lava carve orange veins through black rock. The heat is almost unbearable.',
+    mood: 'hellish and volatile'
   },
   {
     path: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
-    description: 'A fog-shrouded shoreline where black waves crash against pale sand. The sea hides something vast and patient beneath its surface.'
+    name: 'Abyssal Shore',
+    description: 'A fog-shrouded shoreline where black waves crash against pale sand. The sea hides something vast and patient beneath its surface.',
+    mood: 'eerie and vast'
   },
 ];
 
-// Function to fetch and append local images from JSON
-async function appendLocalImages() {
-  try {
-    const response = await fetch('backgrounds.json');
-    const localBackgrounds = await response.json();
-    
-    // Append each local entry to the existing `backgrounds` array
-    backgrounds.push(...localBackgrounds);
-    
-    console.log(`Added ${localBackgrounds.length} local images. Total now: ${backgrounds.length}`);
-    
-    // If you have a renderizer function that displays the images,
-    // call it again to refresh the UI with the updated list
-    if (typeof renderizer === 'function') {
-      renderizer();  // or pass the new `backgrounds` array if needed
-    }
-  } catch (error) {
-    console.error('Failed to load local backgrounds:', error);
-  }
-}
-
-// Call the function on startup
-appendLocalImages();
-
 /* ============================================================
-   GAME STATE
+   STATE MODEL
 ============================================================ */
 const state = {
-  phase: 'menu',        // menu | encounter | reward | dead
-  playerDesc: '',
-  playerLevel: '',
-  playerRace: '',
-  playerClass: '',
-  playerCharSheet: '',
-  inventory: [],
-  monstersDefeated: 0,
-  background: null,
-  monster: null,        // { name, description, hp, maxHp }
-  player: { hp: 100, maxHp: 100 },
+  phase: 'menu',
+  // Player
+  player: {
+    description: '',
+    race: '',
+    class: '',
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+    attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+    armor_class: 12,
+    inventory: [],
+    statusEffect: '',
+  },
+  // World
+  world: {
+    biome: null,
+    encounterIndex: 0,
+    totalEncounters: 4, // 3 normal + 1 boss
+  },
+  // Monster
+  monster: null,
+  // Combat
+  combat: {
+    turnNumber: 0,
+    historyLog: [],
+    lastOutcome: '',
+  },
 };
 
 /* ============================================================
-   LLM INTERFACE
-   ----------------------------------------------------------
-   Each function below builds the exact prompt that will be
-   sent to the real LLM, then calls mockLLMResponse() which
-   simulates a reply. To wire up a real API, replace the body
-   of mockLLMResponse() with a fetch() call to your endpoint,
-   using the prompt string it receives.
+   PROMPT BUILDERS
 ============================================================ */
-
-/**
- * PROMPT 1 — Ask the LLM to create a monster for the current encounter.
- */
-function buildMonsterPrompt(background, difficulty) {
-  return `You are the game master of a retro fantasy adventure game.
-
-SETTING:
-${background.description}
-
-PLAYER DESCRIPTION:
-${state.playerDesc}
-
-PLAYER INVENTORY:
-${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
-
-DIFFICULTY (monsters defeated so far): ${difficulty}
-
-Your task: Create a single monster appropriate for this setting and difficulty level.
-Stronger difficulty means a more powerful, cunning, or terrifying creature.
-
-Respond with ONLY valid JSON in this exact shape:
-{
-  "name": "Monster Name",
-  "description": "2-3 sentence vivid description of the monster's appearance and threat.",
-  "intro": "1-2 sentence atmospheric intro shown to the player when the monster appears.",
-  "hp": <integer 1-100, scaled with difficulty>
-}`;
-}
-
 
 function buildCharacterPrompt() {
   return `Role: You are a professional D&D 5th Edition Dungeon Master and Systems Designer. Your task is to translate a character concept into a mechanically accurate 5e character sheet.
 
-  Input Variables:
-Race: ${state.playerRace}
-Class: ${state.playerClass}
-Level: ${state.playerLevel}
-Description: ${state.playerDesc}
+Input Variables:
+Race: ${state.player.race}
+Class: ${state.player.class}
+Level: ${state.player.level}
+Description: ${state.player.description}
 
 Strict Rules for Generation:
 Attributes: Use the Standard Array (15, 14, 13, 12, 10, 8). Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
 Armor Class (AC): Calculate based on the most appropriate starting armor for the class + DEX modifier.
 
 Output Format:
-     You MUST respond only with a valid JSON object following this exact structure: 
-{ "character_metadata": { "race": "string", "class": "string", "level": "number" }, "attributes": { "strength": "number", "dexterity": "number", "constitution": "number", "intelligence": "number", "wisdom": "number", "charisma": "number"}, "armor_class": "number" } 
-`;
+You MUST respond only with a valid JSON object following this exact structure:
+{ "character_metadata": { "race": "string", "class": "string", "level": "number" }, "attributes": { "strength": "number", "dexterity": "number", "constitution": "number", "intelligence": "number", "wisdom": "number", "charisma": "number" }, "armor_class": "number" }`;
 }
-/**
- * PROMPT 2/3 — Ask the LLM to resolve one player action in combat.
- */
-function buildCombatPrompt(playerAction, monster, background) {
-  return `You are the game master of a retro fantasy adventure game.
 
-SETTING:
-${background.description}
+function buildMonsterPrompt(isBoss) {
+  const biome = state.world.biome;
+  const difficulty = state.world.encounterIndex;
+  return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
-PLAYER STATS:
-${state.playerDesc} 
+Generate a complete enemy profile for the player to face.
 
-PLAYER DESCRIPTION:
-${state.playerDesc}
+Parameters:
+- Biome/Environment: ${biome.name} — ${biome.description}
+- Difficulty: ${difficulty} encounters completed so far
+- Is_boss: ${isBoss ? 'Yes' : 'No'}
 
-PLAYER INVENTORY:
-${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
+CRITICAL INSTRUCTION: Output ONLY valid JSON. No markdown, no extra text.
 
-MONSTER:
-Name: ${monster.name}
-Description: ${monster.description}
-Monster HP remaining: ${monster.hp} / ${monster.maxHp}
-
-Player HP remaining: ${state.player.hp} / ${state.player.maxHp}
-
-PLAYER ACTION:
-"${playerAction}"
-
-Resolve this action dramatically. Decide how much damage (if any) is dealt to the monster and/or the player.
-Consider the player's items, description, setting, and action creativity.
-
-Respond with ONLY valid JSON in this exact shape:
+Use exactly this JSON structure:
 {
-  "narrative": "2-4 sentence description of what happens.",
-  "playerDamage": <integer 0-40, damage taken by the player>,
-  "monsterDamage": <integer 0-40, damage dealt to the monster>,
-  "outcome": "ongoing" | "player_wins" | "monster_wins"
+  "name": "string",
+  "boss": "${isBoss ? 'Yes' : 'No'}",
+  "description": "A detailed paragraph describing its physical appearance, behavior, and origin. Include subtle hints about its weaknesses and strengths.",
+  "strengths": ["element or concept it resists", "another strength"],
+  "weaknesses": ["element or concept it is vulnerable to", "another weakness"],
+  "intro": "1-2 sentence atmospheric introduction shown when the monster appears.",
+  "hp": ${isBoss ? Math.min(60 + difficulty * 10, 120) : Math.min(30 + difficulty * 12, 80)},
+  "reward_pool": [
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" }
+  ]
 }`;
 }
 
-/**
- * PROMPT 4 — Ask the LLM to generate a reward item after the player wins.
- */
-function buildRewardPrompt(monster, background) {
-  return `You are the game master of a retro fantasy adventure game.
+function buildRoomNarrationPrompt() {
+  const biome = state.world.biome;
+  const monster = state.monster;
+  const player = state.player;
+  return `Role: You are an atmospheric Narrator and Dungeon Master for a dark fantasy adventure.
 
-SETTING:
-${background.description}
+Objective: Narrate the current scene. Immerse the player in the environment and build tension about a potential threat WITHOUT revealing the enemy's name directly.
 
-PLAYER DESCRIPTION:
-A level ${state.playerLevel}  ${state.playerRace} ${state.playerClass}.
+1. Environmental Sensory Input
+- Describe lighting, architecture, atmosphere using the biome.
+- Describe how air feels and what the player hears or smells.
+- Filter description through the player's class and race (e.g., a Rogue notices lack of footprints; a Paladin notices desecration).
 
-${state.playerDesc}
+2. The Obfuscated Threat
+- Do NOT name the enemy. Use only effects, vague silhouettes, shadows, sounds.
+- Describe environmental displacement (reeds parting, a heavy musk, a sound of grinding bone).
 
-PLAYER INVENTORY:
-${state.inventory.length ? state.inventory.map(i => `- ${i}`).join('\n') : '- Nothing (empty-handed)'}
+3. End the narration at the "beat" before combat begins — the moment tension peaks.
 
-DEFEATED MONSTER:
-${monster.name} — ${monster.description}
+INPUTS:
+Player: Level ${player.level} ${player.race} ${player.class} — "${player.description}" — carrying: ${player.inventory.length ? player.inventory.map(i=>i.item_name).join(', ') : 'nothing'}
+Biome: ${biome.name} — ${biome.description} — Mood: ${biome.mood}
+Enemy hints (do NOT name it): ${monster.description}
 
-The player has just defeated this monster. Create one unique item they find or can claim as a reward.
-It should feel thematically linked to the monster and setting, and be concisely described in ≤10 words.
+Respond with ONLY the narration text, 3-5 sentences, no JSON, no labels.`;
+}
 
-Respond with ONLY valid JSON in this exact shape:
+function buildValidationPrompt(playerAction) {
+  const player = state.player;
+  const monster = state.monster;
+  const biome = state.world.biome;
+  const recentHistory = state.combat.historyLog.slice(-3).join('\n');
+
+  return `You are a validation engine for a dungeon-style RPG game. Determine whether the player's declared action is coherent and possible.
+
+You must ONLY return: true or false
+
+INPUTS:
+- player_action: "${playerAction}"
+- player_context:
+  - class: ${player.class}
+  - race: ${player.race}
+  - level: ${player.level}
+  - description: ${player.description}
+  - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
+  - status: "${player.statusEffect || 'none'}"
+  - attributes: STR ${player.attributes.strength}, DEX ${player.attributes.dexterity}, INT ${player.attributes.intelligence}, WIS ${player.attributes.wisdom}, CHA ${player.attributes.charisma}
+
+- Current biome: ${biome.name} — ${biome.description}
+- Enemy: ${monster.name} — ${monster.description}
+- Recent combat history:\n${recentHistory || 'none yet'}
+
+VALIDATION RULES:
+1. The action must be physically and narratively possible within the established fantasy setting.
+2. Player CANNOT use items not in their inventory.
+3. Player CANNOT cast spells or use powers not supported by their class/attributes.
+4. Player CAN use held items creatively, describe physical actions, improvise with the environment.
+5. Be permissive with creativity if the action is plausible.
+6. Reject actions that contradict prior round summaries.
+7. Assume medieval fantasy setting unless context states otherwise.
+
+OUTPUT RULES:
+- Return ONLY: true or false
+- No explanations. No JSON. No markdown. No extra text.`;
+}
+
+function buildCombatPrompt(playerAction) {
+  const player = state.player;
+  const monster = state.monster;
+  const biome = state.world.biome;
+  const recentHistory = state.combat.historyLog.slice(-4).join('\n');
+
+  return `You are the combat resolution engine for a dungeon-style RPG video game.
+
+Evaluate the player's action and determine:
+- How effective the action is against the enemy
+- How much damage the player deals
+- How much damage the player receives
+- A short immersive combat narration
+- A brief round summary for memory
+
+INPUTS:
+- player_action: "${playerAction}"
+- player_context:
+  - race: ${player.race}, class: ${player.class}, level: ${player.level}
+  - description: ${player.description}
+  - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
+  - attributes: STR ${player.attributes.strength}, DEX ${player.attributes.dexterity}, INT ${player.attributes.intelligence}
+  - armor_class: ${player.armor_class}
+  - status: "${player.statusEffect || 'none'}"
+- biome: ${biome.name} — ${biome.description}
+- enemy:
+  - name: ${monster.name}
+  - boss: ${monster.boss}
+  - description: ${monster.description}
+  - strengths: ${JSON.stringify(monster.strengths)}
+  - weaknesses: ${JSON.stringify(monster.weaknesses)}
+  - hp remaining: ${monster.hp}/${monster.maxHp}
+- player_hp_remaining: ${player.hp}/100
+- recent_combat_history:\n${recentHistory || 'Turn 1 — no prior history.'}
+
+COMBAT RULES:
+1. Strongly reward clever tactics, exploiting weaknesses, environmental usage, item synergy.
+2. Penalize ignoring obvious weaknesses, ineffective attacks, impossible actions.
+3. Damage values — damage_dealt: 0-40, damage_received: 0-30 (bosses hit harder).
+4. High damage should feel earned. Weak prompts deal little and may increase incoming damage.
+5. The enemy may counterattack based on the quality of the player's action.
+6. Keep narration concise and immersive (2-3 sentences).
+7. round_summary: 1 sentence factual combat summary for memory.
+
+OUTPUT FORMAT — Return ONLY this JSON:
 {
-  "item": "Short evocative item name and descriptor",
-  "flavour": "One sentence about what makes this item special or eerie."
-}`;
+  "outcome": "short immersive narration",
+  "damage_dealt": integer,
+  "damage_received": integer,
+  "status": "status effect name or empty string",
+  "round_summary": "brief factual summary",
+  "result": "ongoing" | "player_wins" | "monster_wins"
+}
+
+IMPORTANT: Output must be valid JSON only. No markdown. No explanations outside the JSON.`;
+}
+
+function buildVictoryNarrationPrompt(reward) {
+  const player = state.player;
+  const monster = state.monster;
+  const biome = state.world.biome;
+
+  return `Role: You are an atmospheric Narrator and Dungeon Master.
+
+Objective: Narrate the immediate aftermath of combat. Transition from the heat of battle to the cold reality of the environment.
+
+1. The Reveal: The enemy is now dead. Describe it fully — its appearance in death, the damage from the final blow.
+2. The Physical Toll: Reference the player's condition based on HP (${player.hp}/100). Mention any status effects: "${player.statusEffect || 'none'}".
+3. Environmental Shift: How has the environment changed? Blood, scorch marks, silence?
+4. Tone: A near-death victory feels harrowing and lucky. A clean victory feels gritty but empowering.
+
+INPUTS:
+Player: Level ${player.level} ${player.race} ${player.class} — "${player.description}"
+Biome: ${biome.name} — ${biome.description}
+Enemy: ${monster.name} — ${monster.description}
+Last outcome: ${state.combat.lastOutcome}
+Item reward chosen: ${reward ? reward.item_name : 'none yet'}
+
+Respond with ONLY narration text, 3-5 sentences. No JSON, no labels, no markdown.`;
 }
 
 /* ============================================================
-   REAL LLM RESPONSE
-   ----------------------------------------------------------
-   Receives the prompt string (for inspection/logging),
-   returns a parsed JS object matching the expected JSON shape.
-   Replace this entire function body with a real fetch() call.
-*/
+   LLM INTERFACE
+============================================================ */
 async function llmResponse(prompt) {
   console.groupCollapsed('[LLM PROMPT]');
   console.log(prompt);
-  console.log('Calling endpoint...');
-  console.groupEnd();
+  
+
+  let attempts = 0;
 
   const res = await fetch('/api/llm', {
     method: 'POST',
@@ -653,125 +749,59 @@ async function llmResponse(prompt) {
   });
 
   const data = await res.json();
-
-  console.log('FULL SERVER RESPONSE:', data);
+  console.log('LLM response:', data);
+  console.groupEnd();
 
   if (!res.ok) {
-    console.error('Backend error:', data);
-    throw new Error(data.error || 'Backend failed');
+    console.error('API error:', data);
+    throw new Error(data.error?.message || 'API failed');
   }
 
-  const rawText = data.choices?.[0]?.message?.content;
-  if (!rawText) {
-    throw new Error('LLM returned no content');
-  }
-
+  const rawText = data.content || '';
   console.groupCollapsed('[LLM RAW OUTPUT]');
   console.log(rawText);
   console.groupEnd();
 
-  const cleanedText = rawText
-    .replace(/<think>[\s\S]*?<\/think>/gi, '')
-    .trim();
-
-  return parseJsonWithRetries(cleanedText, 3);
+  return rawText;
 }
 
-function parseJsonWithRetries(text, maxRetries = 3) {
-  let lastError = null;
-  let candidate = text;
+async function llmJSON(prompt) {
+  let attempts = 0;
+  let not_finished = true;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  while (attempts < 3 && not_finished) {
     try {
-      return JSON.parse(candidate);
-    } catch (err) {
-      lastError = err;
-
-      const start = candidate.indexOf('{');
-      const end = candidate.lastIndexOf('}');
-
-      if (start !== -1 && end !== -1 && end > start) {
-        candidate = candidate.slice(start, end + 1);
-        try {
-          return JSON.parse(candidate);
-        } catch (err2) {
-          lastError = err2;
-        }
-      }
-
-      candidate = candidate
-        .replace(/^[\s\S]*?(\{)/, '$1')
-        .replace(/(\})[\s\S]*$/, '$1')
-        .trim();
+      const json = await llmResponse(prompt);
+      out = parseJsonSafe(json);
+      not_finished = false;
+      return out;
+    } catch (e) {
+      console.warn('LLM JSON parse failed, retrying...', e);
+      attempts++;
     }
+    const raw = await llmResponse(prompt);
+    return parseJsonSafe(raw);
   }
-
-  console.error('Invalid JSON after retries:', text);
-  throw lastError || new Error('Invalid JSON');
 }
-/* ============================================================
-   MOCK LLM RESPONSE
-   ----------------------------------------------------------
-   Receives the prompt string (for inspection/logging),
-   returns a parsed JS object matching the expected JSON shape.
-   Replace this entire function body with a real fetch() call.
-============================================================ */
-async function mockLLMResponse(prompt) {
-  // Log the prompt so you can inspect it in the console
-  console.groupCollapsed('[LLM PROMPT]');
-  console.log(prompt);
-  console.groupEnd();
 
-  // Simulated network delay
-  await delay(600 + Math.random() * 600);
-
-  // ── Detect which prompt type we're dealing with ──
-  if (prompt.includes('Create a single monster')) {
-    const diff = state.monstersDefeated;
-    const names = ['Cave Troll', 'Shadow Wraith', 'Stone Golem', 'Plague Bat', 'Iron Lich', 'Void Drake', 'Bone Colossus'];
-    const name = names[Math.min(diff, names.length - 1)];
-    const hp = Math.min(30 + diff * 12, 100);
-    return {
-      name,
-      description: `A ${name.toLowerCase()} of considerable menace. Its presence warps the air around it. Ancient and hungry.`,
-      intro: `From the darkness, a ${name.toLowerCase()} emerges — its eyes fixed on you with cold intent.`,
-      hp,
-    };
+function parseJsonSafe(text) {
+  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+  // Try direct parse
+  try { return JSON.parse(cleaned); } catch(_) {}
+  // Extract first JSON object
+  const start = cleaned.indexOf('{');
+  const end   = cleaned.lastIndexOf('}');
+  if (start !== -1 && end > start) {
+    try { return JSON.parse(cleaned.slice(start, end + 1)); } catch(_) {}
   }
-
-  if (prompt.includes('Resolve this action')) {
-    const monsterDamage = Math.floor(Math.random() * 28) + 2;
-    const playerDamage  = Math.floor(Math.random() * 18);
-    const monsterHpAfter = state.monster.hp - monsterDamage;
-    const playerHpAfter  = state.player.hp  - playerDamage;
-    const outcome =
-      monsterHpAfter <= 0 ? 'player_wins' :
-      playerHpAfter  <= 0 ? 'monster_wins' :
-      'ongoing';
-    return {
-      narrative: outcome === 'player_wins'
-        ? `Your strike finds its mark with brutal precision. The ${state.monster.name} lets out a final shriek and crumbles.`
-        : outcome === 'monster_wins'
-        ? `The ${state.monster.name} overwhelms you with a devastating blow. Darkness closes in.`
-        : `You press your attack. The ${state.monster.name} staggers — but retaliates, catching you off guard.`,
-      playerDamage,
-      monsterDamage,
-      outcome,
-    };
+  // Try extracting JSON array
+  const aStart = cleaned.indexOf('[');
+  const aEnd   = cleaned.lastIndexOf(']');
+  if (aStart !== -1 && aEnd > aStart) {
+    try { return JSON.parse(cleaned.slice(aStart, aEnd + 1)); } catch(_) {}
   }
-
-  if (prompt.includes('Create one unique item')) {
-    const items = [
-      { item: 'Fang of the Fallen — a jagged obsidian tooth', flavour: 'Radiates a cold hunger that never quite leaves your hand.' },
-      { item: 'Wraith-silk Cloak — woven from shadow itself', flavour: 'Those who wear it feel slightly less real.' },
-      { item: 'Ember Core — a pulsing shard of solidified fire', flavour: 'Keeps your palm warm even in the deepest cold.' },
-      { item: 'Void-touched Lens — warps what you see', flavour: 'Through it, hidden things become briefly visible.' },
-      { item: 'Bone Sigil — carved from something that once spoke', flavour: 'Hums faintly when danger is near.' },
-    ];
-    return items[Math.floor(Math.random() * items.length)];
-  }
-
-  return { error: 'Unknown prompt type.' };
+  console.error('JSON parse failed on:', text);
+  throw new Error('Invalid JSON from LLM');
 }
 
 /* ============================================================
@@ -811,20 +841,19 @@ function drainQueue() {
     }
     storyLog += text[i++];
     storyEl.textContent = storyLog;
-    // keep latest text visible
     if (storyEl.offsetHeight > storyEl.parentElement.offsetHeight) {
       storyEl.style.top = 'auto';
       storyEl.style.bottom = '0';
     }
-  }, 24);
+  }, 22);
 }
 
-function print(text, cb) {
-  typeWrite(text + '\n', cb);
-}
+function print(text, cb) { typeWrite(text + '\n', cb); }
 
-function delay(ms) {
-  return new Promise(res => setTimeout(res, ms));
+function delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+function typeAsync(text) {
+  return new Promise(res => typeWrite(text, res));
 }
 
 /* ============================================================
@@ -834,9 +863,8 @@ const hud = document.getElementById('hud');
 
 function showHUD(monsterName) {
   hud.style.display = 'flex';
-  // shift viewport down to make room
   document.getElementById('story-viewport').style.top = '80px';
-  document.getElementById('monster-name-label').textContent = monsterName.toUpperCase().slice(0, 10);
+  document.getElementById('monster-name-label').textContent = monsterName.toUpperCase().slice(0, 12);
   updateHUD();
 }
 
@@ -846,13 +874,14 @@ function hideHUD() {
 }
 
 function updateHUD() {
-  const pPct = Math.max(0, (state.player.hp / state.player.maxHp) * 100);
-  const mPct = Math.max(0, (state.monster ? state.monster.hp / state.monster.maxHp * 100 : 100));
+  const p = state.player;
+  const m = state.monster;
+  const pPct = Math.max(0, (p.hp / p.maxHp) * 100);
+  const mPct = m ? Math.max(0, (m.hp / m.maxHp) * 100) : 100;
   document.getElementById('player-bar-fill').style.width  = pPct + '%';
   document.getElementById('monster-bar-fill').style.width = mPct + '%';
-  document.getElementById('player-hp-label').textContent  = Math.max(0, state.player.hp);
-  document.getElementById('monster-hp-label').textContent = state.monster ? Math.max(0, state.monster.hp) : '?';
-  // Colour the player bar based on HP
+  document.getElementById('player-hp-label').textContent  = Math.max(0, p.hp);
+  document.getElementById('monster-hp-label').textContent = m ? Math.max(0, m.hp) : '?';
   document.getElementById('player-bar-fill').style.background =
     pPct > 50 ? '#6adf7e' : pPct > 25 ? '#dfcc6a' : '#df6a6a';
 }
@@ -872,38 +901,83 @@ function clearBackground() {
 }
 
 /* ============================================================
+   REWARD OVERLAY
+============================================================ */
+function showRewardOverlay(rewardPool, onChoice) {
+  const overlay = document.getElementById('reward-overlay');
+  const cards   = document.getElementById('reward-cards');
+  cards.innerHTML = '';
+
+  rewardPool.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'reward-card';
+    card.innerHTML = `
+      <div class="r-rarity">${item.rarity || 'Common'}</div>
+      <div class="r-name">${item.item_name}</div>
+      <div class="r-desc">${item.item_description}</div>
+      <div class="r-flavour">"${item.flavour}"</div>
+    `;
+    card.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      onChoice(item);
+    });
+    cards.appendChild(card);
+  });
+
+  overlay.style.display = 'flex';
+}
+
+/* ============================================================
    GAME FLOW
 ============================================================ */
 
 function startGame() {
-  let desc = document.getElementById('char-desc-input').value.trim();
-  let level = document.getElementById('char-level-input').value.trim();
-  let race = document.getElementById('char-race-input').value.trim();
-  let player_class = document.getElementById('char-class-input').value.trim();
+  const desc        = document.getElementById('char-desc-input').value.trim() || 'a wandering soul';
+  const playerClass = document.getElementById('char-class-input').value.trim() || 'Warrior';
+  const race        = document.getElementById('char-race-input').value.trim()  || 'Human';
+  const level       = parseInt(document.getElementById('char-level-input').value) || 1;
 
-  if (!desc) {
-    desc = "Normal person"
-  }
-  if (!level || isNaN(level) || level < 1) {
-    level
-  }
-  if (!race) {
-    race = "Human"
-  }
-  if (!player_class) {
-    player_class = "Warrior"
-  }   
-  state.playerDesc = desc;
-  state.playerLevel = level;
-  state.playerRace = race;
-  state.playerClass = player_class;
-  state.phase = 'encounter';
+  state.player.description = desc;
+  state.player.class       = playerClass;
+  state.player.race        = race;
+  state.player.level       = level;
+  state.player.hp          = 100;
+  state.player.maxHp       = 100;
+  state.player.inventory   = [];
+  state.player.statusEffect = '';
+  state.world.encounterIndex = 0;
+  state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  state.combat.historyLog = [];
+
   document.getElementById('start-menu').style.display = 'none';
+  state.phase = 'loading';
 
-  let character_prompt = buildCharacterPrompt();
-  llmResponse(character_prompt);
-//   state.playerCharSheet = mockLLMResponse(character_prompt)
+  // Generate character sheet async (non-blocking — apply when ready)
+  generateCharacterSheet();
+
   runEncounterLoop();
+}
+
+async function generateCharacterSheet() {
+  try {
+    const prompt = buildCharacterPrompt();
+    const sheet = await llmJSON(prompt);
+    // Apply attributes and AC from sheet
+    if (sheet.attributes) {
+      state.player.attributes = {
+        strength:     sheet.attributes.strength     || 10,
+        dexterity:    sheet.attributes.dexterity    || 10,
+        constitution: sheet.attributes.constitution || 10,
+        intelligence: sheet.attributes.intelligence || 10,
+        wisdom:       sheet.attributes.wisdom       || 10,
+        charisma:     sheet.attributes.charisma     || 10,
+      };
+    }
+    if (sheet.armor_class) state.player.armor_class = sheet.armor_class;
+    console.log('[Character Sheet]', sheet);
+  } catch(e) {
+    console.warn('Character sheet generation failed, using defaults:', e);
+  }
 }
 
 document.getElementById('char-desc-input').addEventListener('keydown', e => {
@@ -914,40 +988,79 @@ async function runEncounterLoop() {
   setBusy(true);
   clearBackground();
 
-  // Pick a random background
-  const bg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-  state.background = bg;
+  const biome = state.world.biome;
+  const isBoss = state.world.encounterIndex >= state.world.totalEncounters - 1;
 
-  // Reset player HP each encounter? Uncomment if desired:
-  // state.player.hp = state.player.maxHp;
+  // Reset combat state
+  state.combat.turnNumber = 0;
+  state.combat.historyLog = [];
+  state.combat.lastOutcome = '';
+  state.player.hp = state.player.maxHp;
+  state.player.statusEffect = '';
 
   storyLog = '';
   storyEl.textContent = '';
 
-  setBackground(bg);
-  await delay(300);
+  setBackground(biome);
+  await delay(400);
 
-  // ── Encounter header ──
-  const encounterNum = state.monstersDefeated + 1;
-  await typeAsync(`\n★ ENCOUNTER ${encounterNum} ★\n`);
+  const encounterNum = state.world.encounterIndex + 1;
+  await typeAsync(`\n${isBoss ? '★★ BOSS ENCOUNTER ★★' : `★ ENCOUNTER ${encounterNum} ★`}\n`);
   await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
-  await typeAsync(bg.description + '\n\n');
+  await typeAsync(`${biome.name.toUpperCase()}\n\n`);
 
-  // ── Generate monster ──
+  // Generate monster
   await typeAsync('Something stirs in the dark...\n\n');
-  const monsterPrompt = buildMonsterPrompt(bg, state.monstersDefeated);
-  const monsterData   = await mockLLMResponse(monsterPrompt);
+  let monsterData;
+  try {
+    const prompt = buildMonsterPrompt(isBoss);
+    monsterData = await llmJSON(prompt);
+  } catch(e) {
+    console.error('Monster generation failed:', e);
+    monsterData = {
+      name: isBoss ? 'Ancient Horror' : 'Cave Troll',
+      boss: isBoss ? 'Yes' : 'No',
+      description: 'A hulking, ancient creature of considerable menace.',
+      strengths: ['brute force', 'darkness'],
+      weaknesses: ['fire', 'light magic'],
+      intro: 'A monstrous shape looms from the shadows — eyes fixed on you with cold intent.',
+      hp: isBoss ? 80 : 40,
+      reward_pool: [
+        { item_name: 'Troll Fang', item_description: 'Adds force to melee attacks', flavour: 'Still warm from the kill.', rarity: 'Common' },
+        { item_name: 'Shadow Cloak', item_description: 'Reduces incoming damage from darkness attacks', flavour: 'Absorbs the light around you.', rarity: 'Uncommon' },
+        { item_name: 'Stone Heart', item_description: 'Increases resilience against physical blows', flavour: 'Heavy as regret.', rarity: 'Rare' },
+      ]
+    };
+  }
 
   state.monster = {
-    name: monsterData.name,
+    name:        monsterData.name,
+    boss:        monsterData.boss,
     description: monsterData.description,
-    hp: monsterData.hp,
-    maxHp: monsterData.hp,
+    strengths:   monsterData.strengths  || [],
+    weaknesses:  monsterData.weaknesses || [],
+    hp:          monsterData.hp,
+    maxHp:       monsterData.hp,
+    reward_pool: monsterData.reward_pool || [],
   };
 
   showHUD(monsterData.name);
-  await typeAsync(monsterData.intro + '\n\n');
-  await typeAsync(`[ ${monsterData.name.toUpperCase()} — ${monsterData.description} ]\n\n`);
+
+  // Room narration
+  let narration = '';
+  try {
+    narration = await llmResponse(buildRoomNarrationPrompt());
+    narration = narration.replace(/```[\s\S]*?```/g, '').trim();
+  } catch(e) {
+    narration = monsterData.intro;
+  }
+
+  await typeAsync(narration + '\n\n');
+
+  await typeAsync(`[ ${monsterData.name.toUpperCase()} ]`);
+  if (isBoss) await typeAsync(' ⚠ BOSS');
+  await typeAsync(`\n`);
+  await typeAsync(`Weaknesses: ${state.monster.weaknesses.join(', ')}\n`);
   await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   state.phase = 'encounter';
@@ -960,54 +1073,128 @@ async function handleCombatAction(action) {
 
   await typeAsync(`\n> ${action}\n\n`);
 
-  const prompt  = buildCombatPrompt(action, state.monster, state.background);
-  const result  = await mockLLMResponse(prompt);
+  // ── VALIDATION ──
+  let isValid = true;
+  try {
+    const validationPrompt = buildValidationPrompt(action);
+    const validationRaw    = await llmResponse(validationPrompt);
+    const cleaned          = validationRaw.trim().toLowerCase();
+    isValid = cleaned.startsWith('true');
+  } catch(e) {
+    console.warn('Validation failed, defaulting to valid:', e);
+    isValid = true;
+  }
+
+  if (!isValid) {
+    await typeAsync('⚠ That action is not possible in your current situation.\n');
+    await typeAsync('  Consider your inventory, class abilities, and the environment.\n\n');
+    setBusy(false);
+    return;
+  }
+
+  // ── COMBAT RESOLUTION ──
+  let result;
+  try {
+    const combatPrompt = buildCombatPrompt(action);
+    result = await llmJSON(combatPrompt);
+  } catch(e) {
+    console.error('Combat resolution failed:', e);
+    result = {
+      outcome: `You press the attack. The ${state.monster.name} staggers but retaliates viciously.`,
+      damage_dealt:   Math.floor(Math.random() * 20) + 5,
+      damage_received: Math.floor(Math.random() * 15),
+      status: '',
+      round_summary: `Player attacked ${state.monster.name}. Exchange of blows.`,
+      result: 'ongoing',
+    };
+  }
 
   // Apply damage
-  state.monster.hp -= result.monsterDamage;
-  state.player.hp  -= result.playerDamage;
+  const dmgDealt    = Math.min(result.damage_dealt    || 0, 40);
+  const dmgReceived = Math.min(result.damage_received || 0, 30);
+  state.monster.hp  -= dmgDealt;
+  state.player.hp   -= dmgReceived;
+  state.combat.turnNumber++;
+
+  if (result.status) state.player.statusEffect = result.status;
+  state.combat.lastOutcome = result.outcome || '';
+
+  // Store round summary in history
+  if (result.round_summary) {
+    state.combat.historyLog.push(`Turn ${state.combat.turnNumber}: ${result.round_summary}`);
+    if (state.combat.historyLog.length > 6) state.combat.historyLog.shift();
+  }
+
   updateHUD();
 
-  await typeAsync(result.narrative + '\n');
-
-  if (result.playerDamage > 0)
-    await typeAsync(`  You take ${result.playerDamage} damage. (HP: ${Math.max(0, state.player.hp)})\n`);
-  if (result.monsterDamage > 0)
-    await typeAsync(`  ${state.monster.name} takes ${result.monsterDamage} damage. (HP: ${Math.max(0, state.monster.hp)})\n`);
-
+  await typeAsync((result.outcome || '') + '\n');
+  if (dmgDealt    > 0) await typeAsync(`  You deal ${dmgDealt} damage. (${state.monster.name}: ${Math.max(0, state.monster.hp)} HP)\n`);
+  if (dmgReceived > 0) await typeAsync(`  You take ${dmgReceived} damage. (You: ${Math.max(0, state.player.hp)} HP)\n`);
+  if (result.status) await typeAsync(`  Status: [${result.status.toUpperCase()}]\n`);
   await typeAsync('\n');
 
-  if (result.outcome === 'player_wins' || state.monster.hp <= 0) {
-    await handleVictory();
-  } else if (result.outcome === 'monster_wins' || state.player.hp <= 0) {
-    await handleDeath();
-  } else {
-    setBusy(false);
-  }
+  // Check outcome
+  const win  = result.result === 'player_wins' || state.monster.hp <= 0;
+  const lose = result.result === 'monster_wins' || state.player.hp <= 0;
+
+  if (win)       { await handleVictory(); }
+  else if (lose) { await handleDeath(); }
+  else           { setBusy(false); }
 }
 
 async function handleVictory() {
-  state.monstersDefeated++;
   hideHUD();
 
-  await typeAsync(`★ VICTORY! The ${state.monster.name} has been defeated! ★\n\n`);
+  const monster = state.monster;
+  const biome   = state.world.biome;
+  const isBoss  = state.world.encounterIndex >= state.world.totalEncounters - 1;
 
-  const rewardPrompt = buildRewardPrompt(state.monster, state.background);
-  const reward       = await mockLLMResponse(rewardPrompt);
+  await typeAsync(`★ VICTORY! ${monster.name} has fallen! ★\n\n`);
 
-  state.inventory.push(reward.item);
+  // Victory narration
+  try {
+    const narration = await llmResponse(buildVictoryNarrationPrompt(null));
+    await typeAsync(narration.replace(/```[\s\S]*?```/g, '').trim() + '\n\n');
+  } catch(e) {
+    await typeAsync(`The ${monster.name} crumbles. Silence returns to ${biome.name}.\n\n`);
+  }
 
-  await typeAsync(`You search the remains...\n\n`);
-  await typeAsync(`  [ ITEM GAINED ]\n`);
-  await typeAsync(`  ${reward.item}\n`);
-  await typeAsync(`  "${reward.flavour}"\n\n`);
-  await typeAsync(`Your inventory: ${state.inventory.join(' | ')}\n\n`);
-  await typeAsync('Advance to the next encounter...\n');
-
-  state.phase = 'reward';
-  inputEl.placeholder = 'Anything to say to lady death? There will be consequences...';
+  // Show reward overlay
+  const rewardPool = monster.reward_pool && monster.reward_pool.length >= 3
+    ? monster.reward_pool
+    : [
+        { item_name: 'Monster Essence', item_description: 'A lingering power from the fallen foe', flavour: 'It hums with residual will.', rarity: 'Common' },
+        { item_name: 'Blood Token',     item_description: 'Intimidates weaker enemies on sight',   flavour: 'Stained but unbroken.',        rarity: 'Common' },
+        { item_name: 'Void Shard',      item_description: 'Cleaves through magical defenses',      flavour: 'Cold to the touch, always.',   rarity: 'Rare'   },
+      ];
 
   setBusy(false);
+
+  showRewardOverlay(rewardPool, async (chosenItem) => {
+    setBusy(true);
+    state.player.inventory.push(chosenItem);
+
+    await typeAsync(`  [ ITEM GAINED: ${chosenItem.item_name} ]\n`);
+    await typeAsync(`  "${chosenItem.flavour}"\n\n`);
+    await typeAsync(`Inventory: ${state.player.inventory.map(i => i.item_name).join(' | ')}\n\n`);
+
+    if (isBoss) {
+      // End of run — biome complete
+      await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      await typeAsync('★★ THE BIOME IS CONQUERED ★★\n\n');
+      await typeAsync(`Encounters survived: ${state.world.encounterIndex + 1}\n`);
+      await typeAsync(`Items collected: ${state.player.inventory.length}\n\n`);
+      await typeAsync('Type RESTART to begin a new run.\n');
+      inputEl.placeholder = 'Type RESTART...';
+      state.phase = 'dead';
+      setBusy(false);
+    } else {
+      state.world.encounterIndex++;
+      state.phase = 'reward';
+      inputEl.placeholder = 'Press ENTER to advance...';
+      setBusy(false);
+    }
+  });
 }
 
 async function handleDeath() {
@@ -1017,8 +1204,9 @@ async function handleDeath() {
 
   await typeAsync('\n\n');
   await typeAsync('★ ★ ★  GAME OVER  ★ ★ ★\n\n');
-  await typeAsync(`Monsters defeated: ${state.monstersDefeated}\n`);
-  await typeAsync(`Items collected:   ${state.inventory.length ? state.inventory.join(', ') : 'none'}\n\n`);
+  await typeAsync(`You fell to the ${state.monster.name}.\n`);
+  await typeAsync(`Encounters survived: ${state.world.encounterIndex}\n`);
+  await typeAsync(`Items collected:     ${state.player.inventory.length ? state.player.inventory.map(i => i.item_name).join(', ') : 'none'}\n\n`);
   await typeAsync('Type RESTART to play again.\n');
 
   inputEl.placeholder = 'Type RESTART...';
@@ -1034,28 +1222,20 @@ function submitInput() {
   inputEl.value = '';
   if (!raw) return;
 
-  // ── DEAD state ──
   if (state.phase === 'dead') {
     if (raw.toLowerCase() === 'restart') {
-      state.inventory = [];
-      state.monstersDefeated = 0;
-      state.player.hp = state.player.maxHp;
-      state.monster = null;
-      state.phase = 'menu';
       document.getElementById('char-desc-input').value = '';
       document.getElementById('start-menu').style.display = 'flex';
+      state.phase = 'menu';
     }
     return;
   }
 
-  // ── REWARD / between encounters ──
   if (state.phase === 'reward') {
-    state.player.hp = state.player.maxHp; // heal between encounters
     runEncounterLoop();
     return;
   }
 
-  // ── COMBAT ──
   if (state.phase === 'encounter') {
     handleCombatAction(raw);
   }
@@ -1064,13 +1244,6 @@ function submitInput() {
 inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter') submitInput();
 });
-
-/* ============================================================
-   HELPERS
-============================================================ */
-function typeAsync(text) {
-  return new Promise(res => typeWrite(text, res));
-}
 </script>
 </body>
 </html>

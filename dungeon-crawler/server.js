@@ -44,7 +44,10 @@ app.post('/api/llm', async (req, res) => {
       });
     }
 
-    res.type('json').send(text);
+    const hfJson = JSON.parse(text);
+    const content = hfJson?.choices?.[0]?.message?.content || '';
+
+    res.json({ content });
   } catch (err) {
     console.error('SERVER CRASH:', err);
     res.status(500).json({
