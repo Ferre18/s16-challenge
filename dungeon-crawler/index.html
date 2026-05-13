@@ -463,7 +463,7 @@
 /* ============================================================
    BACKGROUNDS
 ============================================================ */
-const backgrounds = [
+let backgrounds = [
   {
     path: 'https://images.unsplash.com/photo-1518562180175-34a163b1a9a6?w=800&q=80',
     name: 'Sunken Catacombs',
@@ -496,6 +496,30 @@ const backgrounds = [
   },
 ];
 
+
+// Function to fetch and append local images from JSON
+async function appendLocalImages() {
+  try {
+    const response = await fetch('backgrounds.json');
+    const localBackgrounds = await response.json();
+    
+    // Append each local entry to the existing `backgrounds` array
+    backgrounds.push(...localBackgrounds);
+    
+    console.log(`Added ${localBackgrounds.length} local images. Total now: ${backgrounds.length}`);
+    
+    // If you have a renderizer function that displays the images,
+    // call it again to refresh the UI with the updated list
+    if (typeof renderizer === 'function') {
+      renderizer();  // or pass the new `backgrounds` array if needed
+    }
+  } catch (error) {
+    console.error('Failed to load local backgrounds:', error);
+  }
+}
+
+// Call the function on startup
+appendLocalImages();
 /* ============================================================
    STATE MODEL
 ============================================================ */

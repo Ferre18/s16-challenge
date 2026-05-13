@@ -1,18 +1,129 @@
 [
   {
+    "path": "images/abandoned_prison.png",
+    "name": "Abandoned Prison",
+    "description": "A long-abandoned prison corridor deep underground with rusted iron cell doors, broken manacles, decaying straw pallets, and a single shaft of dusty gray light piercing through a high window. Cobwebs drape the bars, debris litters the floor, and a toppled guard's chair rots in the darkness.",
+    "mood": "desolate and oppressive"
+  },
+  {
+    "path": "images/barracks_training_grounds.png",
+    "name": "Training Barracks",
+    "description": "A stone military training hall lined with wooden practice dummies scarred from countless sword strikes. Weapon racks hold blunted training swords and wooden shields, while leather armor hangs from wall pegs. An iron brazier glows in the corner, and a chalkboard on the back wall shows faded tactical diagrams.",
+    "mood": "disciplined and practical"
+  },
+  {
+    "path": "images/battlefield.png",
+    "name": "Battlefield",
+    "description": "A silent field in the aftermath of battle, with battered swords and broken spears plunged into the earth like grave markers. Dented shields and tattered heraldic banners hang limply from leaning poles. A burned-out siege weapon lies collapsed in the mist, while black crows perch on the debris under a heavy gray sky.",
+    "mood": "somber and haunting"
+  },
+  {
+    "path": "images/castle_gate.png",
+    "name": "Castle Gate",
+    "description": "The formidable outer gate of a medieval castle with massive iron-banded wooden doors set into towering stone walls. A raised portcullis hangs like a waiting jaw between two square guard towers flying colorful heraldic banners. A cobblestone road leads toward the gate under a crisp blue sky.",
+    "mood": "grand and imposing"
+  },
+  {
+    "path": "images/castle_on_stonecliff.png",
+    "name": "Castle on Stone Cliff",
+    "description": "Rolling green fields and gentle hills stretching toward the horizon, dotted with wildflowers and framed by wooden fence posts. In the far distance, a massive stone cliff rises abruptly from the plains, crowned by an impressive castle with multiple towers and dark blue slate roofs.",
+    "mood": "peaceful and hopeful"
+  },
+  {
+    "path": "images/desert_camp.png",
+    "name": "Desert Nomad Camp",
+    "description": "A nomadic desert camp under a vast star-filled night sky. Colorful woven tents glow from within around a central campfire while rolling sand dunes stretch endlessly into the distance beneath a crescent moon.",
+    "mood": "warm and sheltered"
+  },
+  {
     "path": "images/desert_ruins.png",
-    "description": "Ancient sandstone ruins half-buried in endless dunes. The wind whispers forgotten secrets through broken arches."
+    "name": "Sunken Desert Ruins",
+    "description": "Massive sandstone ruins half-buried in golden desert dunes. Cracked columns and fallen statues litter the foreground while a weathered stone staircase descends into darkness beneath a blazing midday sun.",
+    "mood": "ancient and mysterious"
   },
   {
-    "path": "images/tavern.png",
-    "description": "A warm, smoky tavern lit by flickering lanterns. The smell of roasted meat and spilled ale fills the air."
+    "path": "images/docks.png",
+    "name": "Harbor Docks",
+    "description": "A busy medieval harbor filled with weathered planks, stacked crates, coiled ropes, and merchant ships anchored in deep teal water while a bustling port town rises along the far shoreline.",
+    "mood": "busy and maritime"
   },
   {
-    "path": "images/skypia.png",
-    "description": "Floating islands above a sea of clouds. Waterfalls plunge into the void. Strange birds sing in the thin air."
+    "path": "images/dwarven_forge.png",
+    "name": "Dwarven Forge",
+    "description": "An underground forge carved into volcanic rock where molten metal flows through glowing stone channels beside massive anvils, weapon racks, and rune-carved support pillars.",
+    "mood": "sweltering and industrious"
   },
   {
     "path": "images/enchanted_forest.png",
-    "description": "A forest of glowing mushrooms and silver-leafed trees. Tiny lights dance between the trunks."
+    "name": "Enchanted Forest",
+    "description": "A mystical ancient forest filled with towering twisted trees marked by glowing blue runes, bioluminescent mushrooms, drifting fireflies, and a winding dirt path beneath a twilight sky.",
+    "mood": "mystical and serene"
+  },
+  {
+    "path": "images/flower_field.png",
+    "name": "Summer Flower Field",
+    "description": "An endless meadow of colorful wildflowers swaying in a warm summer breeze. A narrow dirt path winds toward a lone oak tree while blue mountains rise in the distance.",
+    "mood": "joyful and idyllic"
+  },
+  {
+    "path": "images/graveyard.png",
+    "name": "Graveyard at Dusk",
+    "description": "An old cemetery beneath a fading purple-orange sky where weathered tombstones lean among twisted trees and drifting mist while a lone lantern glows beside an iron gate.",
+    "mood": "somber and gothic"
+  },
+  {
+    "path": "images/monostary_blossom.png",
+    "name": "Cherry Blossom Monastery",
+    "description": "A peaceful mountain monastery surrounded by blooming cherry blossom trees, drifting pink petals, stone lanterns, koi ponds, and mist-covered peaks in the early morning light.",
+    "mood": "peaceful and reflective"
+  },
+  {
+    "path": "images/morrowind.png",
+    "name": "Morrowind Ashlands",
+    "description": "An alien volcanic wasteland of cracked ash-covered earth, towering mushroom trees, ancient skeletons, and distant lava flows beneath a sickly yellow sky.",
+    "mood": "alien and desolate"
+  },
+  {
+    "path": "images/sacred_forest.png",
+    "name": "Sacred Enchanted Forest",
+    "description": "A radiant sacred forest bathed in golden sunlight with silver-barked trees, glowing white flowers, crystal-clear streams, drifting light particles, and an ancient rune-covered shrine.",
+    "mood": "sacred and hopeful"
+  },
+  {
+    "path": "images/skypia.png",
+    "name": "Skypia - Floating Crystal Islands",
+    "description": "Floating islands suspended high above the clouds with waterfalls cascading endlessly into the sky while glowing crystal formations and ancient ruins shimmer in golden sunset light.",
+    "mood": "ethereal and awe-inspiring"
+  },
+  {
+    "path": "images/stormy_shores.png",
+    "name": "Storm-Torn Coast",
+    "description": "A violent coastline battered by massive waves and endless storms where lightning illuminates jagged cliffs, wrecked ships, and wind-bent trees beneath swirling black clouds.",
+    "mood": "dramatic and melancholic"
+  },
+  {
+    "path": "images/tavern.png",
+    "name": "Medieval Tavern",
+    "description": "A warm and lively medieval tavern illuminated by fireplace glow with wooden tables, heraldic banners, hanging chandeliers, polished bar counters, and scattered tankards.",
+    "mood": "warm and welcoming"
+  },
+  {
+    "path": "images/underground_city.png",
+    "name": "Underground Lost City",
+    "description": "The ruins of an ancient city buried beneath the earth where glowing crystals cast cyan and purple light across collapsed stone buildings and silent underground lakes.",
+    "mood": "ancient and majestic"
+  },
+  {
+    "path": "images/witch_pond.png",
+    "name": "Witch's Swamp Pond",
+    "description": "A murky swamp filled with twisted cypress trees, drifting mist, glowing will-o-wisps, half-sunken boats, and a distant hut standing above dark still water.",
+    "mood": "eerie and unsettling"
+  },
+  {
+    "path": "images/wizard_s_library.png",
+    "name": "Wizard's Library",
+    "description": "A vast underground circular library packed with towering bookshelves, spiral walkways, floating crystal lights, ancient tomes, and a massive brass astrolabe hanging from the ceiling.",
+    "mood": "scholarly and mystical"
   }
 ]
+
