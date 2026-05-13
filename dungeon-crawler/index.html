@@ -542,7 +542,7 @@ const state = {
   world: {
     biome: null,
     encounterIndex: 0,
-    totalEncounters: 3,
+    totalEncounters: 1,
     biomeHistory: []
   },
   // Monster
@@ -605,7 +605,7 @@ function getDifficultyTier(difficulty) {
 
 function buildMonsterPrompt(isBoss) {
   const biome = state.world.biome;
-  const difficulty = max(3 * state.world.biomeHistory.length - 1 + state.world.encounterIndex, 0);
+  const difficulty = Math.max(3 * state.world.biomeHistory.length - 1 + state.world.encounterIndex, 0);
   const tier = getDifficultyTier(difficulty);
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
@@ -818,21 +818,17 @@ async function llmResponse(prompt) {
 
 async function llmJSON(prompt) {
   let attempts = 0;
-  let not_finished = true;
-
-  while (attempts < 3 && not_finished) {
+  while (attempts < 3) {
     try {
       const json = await llmResponse(prompt);
-      out = parseJsonSafe(json);
-      not_finished = false;
+      const out = parseJsonSafe(json);
       return out;
     } catch (e) {
       console.warn('LLM JSON parse failed, retrying...', e);
       attempts++;
     }
-    const raw = await llmResponse(prompt);
-    return parseJsonSafe(raw);
   }
+  throw new Error('llmJSON failed after 3 attempts');
 }
 
 function parseJsonSafe(text) {
@@ -1082,13 +1078,8 @@ function startGame() {
   state.player.inventory   = [];
   state.world.biomeHistory = [];
   state.player.statusEffect = '';
-  state.world.encounterIndex = state.world.encounterIndex || 0;
-
-  if (!state.world.biome || state.world.encounterIndex === 0) {
-    state.world.biome = state.world.biome
-      ? getNextBiome()
-      : backgrounds[Math.floor(Math.random() * backgrounds.length)];
-  }
+  state.world.encounterIndex = 0;
+  state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
   state.combat.historyLog = [];
 
   document.getElementById('start-menu').style.display = 'none';
@@ -1374,13 +1365,8 @@ async function handleVictory() {
       state.phase = 'dead';
       setBusy(false);
     } else {
-      state.world.encounterIndex = state.world.encounterIndex || 0;
-
-      if (!state.world.biome || state.world.encounterIndex === 0) {
-        state.world.biome = state.world.biome
-          ? getNextBiome()
-          : backgrounds[Math.floor(Math.random() * backgrounds.length)];
-      }
+      state.world.encounterIndex += 1;
+      state.phase = 'between';
       inputEl.placeholder = 'Press ENTER to advance...';
       setBusy(false);
     }
@@ -1411,7 +1397,7 @@ function submitInput() {
   const raw = inputEl.value.trim();
   inputEl.value = '';
 
-  if (state.phase === 'reward') {
+  if (state.phase === 'between') {
     runEncounterLoop();
     return;
   }
