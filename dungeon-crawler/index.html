@@ -545,7 +545,7 @@ const state = {
   world: {
     biome: null,
     encounterIndex: 0,
-    totalEncounters: 2,
+    totalEncounters: 3,
     biomeHistory: []
   },
   // Monster
@@ -712,6 +712,8 @@ function buildCombatPrompt(playerAction) {
   const player = state.player;
   const monster = state.monster;
   const biome = state.world.biome;
+  const difficulty = Math.max(3 * (state.world.biomeHistory.length - 1) + state.world.encounterIndex, 0);
+  const tier = getDifficultyTier(difficulty);
   const recentHistory = state.combat.historyLog.slice(-4).join('\n');
 
   return `You are the combat resolution engine for a dungeon-style RPG video game.
@@ -722,6 +724,7 @@ Evaluate the player's action and determine:
 - How the health points of both the player and the enemy would change as a result of this action.
 - A short immersive combat narration
 - A brief round summary for memory
+- Use that for a normal human warrior, facing this enemy is considered: ${tier.label}.
 
 INPUTS:
 - biome: ${biome.name} — ${biome.description}
@@ -857,26 +860,42 @@ function parseJsonSafe(text) {
 
 async function preloadNextMonster(targetBiome, targetEncounterIndex) {
   const isBoss = targetEncounterIndex >= state.world.totalEncounters - 1;
-  
-  // Temporarily snapshot what the prompt builder needs from world state
-  const savedBiome  = state.world.biome;
-  const savedIndex  = state.world.encounterIndex;
-  
-  // Mutate for the prompt builder
-  state.world.biome           = targetBiome;
-  state.world.encounterIndex  = targetEncounterIndex;
+  const difficulty = Math.max(3 * (state.world.biomeHistory.length - 1) + targetEncounterIndex, 0);
+  const tier = getDifficultyTier(difficulty);
+
+  const prompt = `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
+
+Generate a complete enemy profile for the player to face. The rewards should be based on the monster, but be usable against other monsters.
+
+Parameters:
+- Biome/Environment: ${targetBiome.name} — ${targetBiome.description}
+- Difficulty: ${tier.label} — ${tier.desc}
+- Is_boss: ${isBoss ? 'Yes' : 'No'}
+
+CRITICAL INSTRUCTION: Output ONLY valid JSON. No markdown, no extra text.
+
+Use exactly this JSON structure:
+{
+  "name": "string",
+  "boss": "${isBoss ? 'Yes' : 'No'}",
+  "description": "A detailed paragraph describing its physical appearance, behavior, and origin. Include subtle hints about its weaknesses and strengths.",
+  "strengths": ["element or concept it resists", "another strength"],
+  "weaknesses": ["element or concept it is vulnerable to", "another weakness"],
+  "intro": "1-2 sentence atmospheric introduction shown when the monster appears.",
+  "hp": ${isBoss ? Math.min(60 + difficulty * 10, 120) : Math.min(30 + difficulty * 12, 80)},
+  "reward_pool": [
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
+    { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" }
+  ]
+}`;
 
   try {
-    const prompt = buildMonsterPrompt(isBoss);
     state.pendingMonster = await llmJSON(prompt);
     console.log('[PRELOAD] Monster ready:', state.pendingMonster?.name);
   } catch(e) {
     console.warn('[PRELOAD] Monster preload failed:', e);
     state.pendingMonster = null;
-  } finally {
-    // RESTORE THE STATE HERE
-    state.world.biome = savedBiome;
-    state.world.encounterIndex = savedIndex;
   }
 }
 
@@ -1098,28 +1117,26 @@ function startGame() {
   const race        = document.getElementById('char-race-input').value.trim()  || 'Human';
   const level       = parseInt(document.getElementById('char-level-input').value) || 1;
 
-  state.player.description = desc;
-  state.player.class       = playerClass;
-  state.player.race        = race;
-  state.player.level       = level;
-  state.player.hp          = 100;
-  state.player.maxHp       = 100;
-  state.player.inventory   = [];
-  state.world.biomeHistory = [];
+  state.player.description  = desc;
+  state.player.class        = playerClass;
+  state.player.race         = race;
+  state.player.level        = level;
+  state.player.hp           = 100;
+  state.player.maxHp        = 100;
+  state.player.inventory    = [];
   state.player.statusEffect = '';
+  state.world.biomeHistory  = [];
   state.world.encounterIndex = 0;
+  state.combat.historyLog   = [];
 
-  state.combat.historyLog = [];
-
+  // Pick starting biome and preload the first monster immediately
+  state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+  preloadNextMonster(state.world.biome, 0);
 
   document.getElementById('start-menu').style.display = 'none';
   state.phase = 'loading';
 
-  
-  // Generate character sheet async (non-blocking — apply when ready)
-
   generateCharacterSheet();
-
   runEncounterLoop();
 }
 
@@ -1367,39 +1384,29 @@ async function handleVictory() {
   state.combat.historyLog = [];
 
   await typeAsync(`★ VICTORY! ${monster.name} has fallen! ★\n\n`);
-  console.log('[VICTORY] encounterIndex:', state.world.encounterIndex, 
-            'totalEncounters:', state.world.totalEncounters);
-  // Victory narration
-  // try {
-  //   const narration = await llmResponse(buildVictoryNarrationPrompt(null));
-  //   await typeAsync(narration.replace(/```[\s\S]*?```/g, '').trim() + '\n\n');
-  // } catch(e) {
-  //   await typeAsync(`The ${monster.name} crumbles. Silence returns to ${biome.name}.\n\n`);
-  // }
+  console.log('[VICTORY] encounterIndex:', state.world.encounterIndex,
+              'totalEncounters:', state.world.totalEncounters);
 
-  // Show reward overlay
   const rewardPool = monster.reward_pool && monster.reward_pool.length >= 3
     ? monster.reward_pool
     : [
-        { item_name: 'Monster Essence', item_description: 'A lingering power from the fallen foe', flavour: 'It hums with residual will.', rarity: 'Common' },
-        { item_name: 'Blood Token',     item_description: 'Intimidates weaker enemies on sight',   flavour: 'Stained but unbroken.',        rarity: 'Common' },
-        { item_name: 'Void Shard',      item_description: 'Cleaves through magical defenses',      flavour: 'Cold to the touch, always.',   rarity: 'Rare'   },
+        { item_name: 'Monster Essence', item_description: 'A lingering power from the fallen foe', flavour: 'It hums with residual will.',   rarity: 'Common' },
+        { item_name: 'Blood Token',     item_description: 'Intimidates weaker enemies on sight',   flavour: 'Stained but unbroken.',          rarity: 'Common' },
+        { item_name: 'Void Shard',      item_description: 'Cleaves through magical defenses',      flavour: 'Cold to the touch, always.',     rarity: 'Rare'   },
       ];
 
-  setBusy(false);
-
-    // Figure out the next biome/index before the player even picks their reward
   const nextEncounterIndex = isBoss ? 0 : state.world.encounterIndex + 1;
   const nextBiome = isBoss
     ? (() => {
-        const unvisited = backgrounds.filter(b => !state.world.biomeHistory.includes(b) && b !== state.world.biome);
-        return unvisited.length ? unvisited[Math.floor(Math.random() * unvisited.length)] : null;
+        const visited   = [...state.world.biomeHistory, state.world.biome];
+        const unvisited = backgrounds.filter(b => !visited.includes(b));
+        return unvisited.length
+          ? unvisited[Math.floor(Math.random() * unvisited.length)]
+          : null;
       })()
     : state.world.biome;
 
   if (nextBiome) preloadNextMonster(nextBiome, nextEncounterIndex);
-
-  setBusy(false);
 
   showRewardOverlay(rewardPool, async (chosenItem) => {
     setBusy(true);
@@ -1415,30 +1422,27 @@ async function handleVictory() {
       await typeAsync(`Items collected: ${state.player.inventory.length}\n\n`);
 
       state.world.biomeHistory.push(state.world.biome);
-      const unvisited = backgrounds.filter(b => !state.world.biomeHistory.includes(b));
 
-      if (unvisited.length === 0) {
+      if (!nextBiome) {
         await typeAsync('★★★ ALL REALMS CONQUERED ★★★\n\n');
         await typeAsync('Type RESTART to begin a new run.\n');
         inputEl.placeholder = 'Type RESTART...';
         state.phase = 'dead';
         setBusy(false);
       } else {
+        state.world.biome          = nextBiome;
         state.world.encounterIndex = 0;
-        state.phase = 'between';
-        state.world.biome = nextBiome; 
-        inputEl.placeholder = 'Press ENTER to advance...';
+        state.phase                = 'between';
+        inputEl.placeholder        = 'Press ENTER to advance...';
         setBusy(false);
       }
     } else {
       state.world.encounterIndex += 1;
-      state.phase = 'between';
-      inputEl.placeholder = 'Press ENTER to advance...';
+      state.phase                 = 'between';
+      inputEl.placeholder         = 'Press ENTER to advance...';
       setBusy(false);
     }
   });
-
-
 }
 
 async function handleDeath() {
