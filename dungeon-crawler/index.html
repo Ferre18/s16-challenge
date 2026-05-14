@@ -413,11 +413,11 @@
       </div>
       <div class="field">
         <label for="char-class-input">CLASS</label>
-        <input id="char-class-input" type="text" placeholder="Warrior" autocomplete="off" spellcheck="false" maxlength="12"/>
+        <input id="char-class-input" type="text" placeholder="Warrior" autocomplete="off" spellcheck="false" maxlength="24"/>
       </div>
       <div class="field">
         <label for="char-race-input">RACE</label>
-        <input id="char-race-input" type="text" placeholder="Elf" autocomplete="off" spellcheck="false" maxlength="12"/>
+        <input id="char-race-input" type="text" placeholder="Elf" autocomplete="off" spellcheck="false" maxlength="24"/>
       </div>
       <div class="field level-field">
         <label for="char-level-input">LEVEL</label>
@@ -513,6 +513,9 @@ async function appendLocalImages() {
     if (typeof renderizer === 'function') {
       renderizer();  // or pass the new `backgrounds` array if needed
     }
+
+    state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    preloadNextMonster(state.world.biome, 0);
   } catch (error) {
     console.error('Failed to load local backgrounds:', error);
   }
@@ -542,11 +545,12 @@ const state = {
   world: {
     biome: null,
     encounterIndex: 0,
-    totalEncounters: 1,
+    totalEncounters: 2,
     biomeHistory: []
   },
   // Monster
   monster: null,
+  pendingMonster: null,
   // Combat
   combat: {
     turnNumber: 0,
@@ -569,7 +573,7 @@ Level: ${state.player.level}
 Description: ${state.player.description}
 
 Strict Rules for Generation:
-Attributes: Use the Standard Array (15, 14, 13, 12, 10, 8). Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
+Attributes: Use Point Buy, considering the input variables. Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
 Armor Class (AC): Calculate based on the most appropriate starting armor for the class + DEX modifier.
 
 Output Format:
@@ -605,8 +609,7 @@ function getDifficultyTier(difficulty) {
 
 function buildMonsterPrompt(isBoss) {
   const biome = state.world.biome;
-  state.monster.maxHp = isBoss ? Math.min(60 + difficulty * 10, 120) : Math.min(30 + difficulty * 12, 80);
-  const difficulty = Math.max(3 * state.world.biomeHistory.length - 1 + state.world.encounterIndex, 0);
+  const difficulty = Math.max(3 * (state.world.biomeHistory.length - 1) + state.world.encounterIndex, 0);
   const tier = getDifficultyTier(difficulty);
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
@@ -616,8 +619,6 @@ Parameters:
 - Biome/Environment: ${biome.name} — ${biome.description}
 - Difficulty: ${tier.label} — ${tier.desc}
 - Is_boss: ${isBoss ? 'Yes' : 'No'}
-- Character class: ${state.player.class}
-- Character description: ${state.player.description}
 
 CRITICAL INSTRUCTION: Output ONLY valid JSON. No markdown, no extra text.
 
@@ -646,9 +647,10 @@ function buildRoomNarrationPrompt() {
 
 Objective: Narrate the current scene. Immerse the player in the environment and build tension about a potential threat WITHOUT revealing the enemy's name directly.
 
-1. Environmental Sensory Input
-- Describe lighting, architecture, atmosphere using the biome.
+1. Environmental 
+- Describe very briefly the lighting, architecture, atmosphere using the biome.
 - Filter description through the player's class and race (e.g., a Rogue notices lack of footprints; a Paladin notices desecration).
+- Describe how your character reaches this place through a portal.
 - Describe how the monster appears and the general appearance.
 
 2. End the narration at the "beat" before combat begins — the moment tension peaks.
@@ -658,7 +660,7 @@ Player: Level ${player.level} ${player.race} ${player.class} — "${player.descr
 Biome: ${biome.name} — ${biome.description} — Mood: ${biome.mood}
 Enemy hints (do NOT name it): ${monster.description}
 
-Respond with ONLY the narration text, 3-5 sentences, no JSON, no labels. Do not think, just improvise.`;
+Respond with ONLY the narration text, 3-5 sentences, with linebreaks, no JSON, no labels. Do not think, just improvise.`;
 }
 
 function buildValidationPrompt(playerAction) {
@@ -695,6 +697,7 @@ VALIDATION RULES:
 6. Reject actions that contradict prior round summaries.
 7. Assume medieval fantasy setting unless context states otherwise.
 8. Magical actions should be constrained by the typical limitations of a Dungeons and Dragons setting. Use the character level for guidance on what is reasonable.
+9. Actions with bad outcomes, like trying to punch a dragon, can be valid. The outcome will just be bad. Do not reject an action solely based on potential negative consequences.
 
 OUTPUT FORMAT — Return ONLY this JSON:
 {
@@ -714,21 +717,13 @@ function buildCombatPrompt(playerAction) {
   return `You are the combat resolution engine for a dungeon-style RPG video game.
 
 Evaluate the player's action and determine:
-- How effective the action is against the enemy
-- How much damage the player deals
-- How much damage the player receives
+- What would occur if the player takes this action, considering the player's attributes, items, and status, as well as the enemy's strengths and weaknesses and the environment.
+- Do not balance the combat. If one side has a clear advantage, the outcome should reflect that. Be honest and consistent with the established context.
+- How the health points of both the player and the enemy would change as a result of this action.
 - A short immersive combat narration
 - A brief round summary for memory
 
 INPUTS:
-- player_action: "${playerAction}"
-- player_context:
-  - race: ${player.race}, class: ${player.class}, level: ${player.level}
-  - description: ${player.description}
-  - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
-  - attributes: STR ${player.attributes.strength}, DEX ${player.attributes.dexterity}, INT ${player.attributes.intelligence}
-  - armor_class: ${player.armor_class}
-  - status: "${player.statusEffect || 'none'}"
 - biome: ${biome.name} — ${biome.description}
 - enemy:
   - name: ${monster.name}
@@ -739,15 +734,21 @@ INPUTS:
   - hp remaining: ${monster.hp}/${monster.maxHp}
 - player_hp_remaining: ${player.hp}/100
 - recent_combat_history:\n${recentHistory || 'Turn 1 — no prior history.'}
+- player_action: "${playerAction}"
+- player_context:
+  - race: ${player.race}, class: ${player.class}, level: ${player.level}
+  - description: ${player.description}
+  - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
+  - attributes: STR ${player.attributes.strength}, DEX ${player.attributes.dexterity}, INT ${player.attributes.intelligence}
+  - armor_class: ${player.armor_class}
+  - status: "${player.statusEffect || 'none'}"
 
 COMBAT RULES:
 1. Strongly reward clever tactics, exploiting weaknesses, environmental usage, item synergy.
 2. Penalize ignoring obvious weaknesses, ineffective attacks, impossible actions.
-3. Damage values — damage_dealt: 0-40, damage_received: 0-30 (bosses hit harder).
-4. High damage should feel earned. Weak prompts deal little and may increase incoming damage.
-5. The enemy may counterattack based on the quality of the player's action.
-6. Keep narration concise and immersive (2-3 sentences).
-7. round_summary: 1 sentence factual combat summary for memory.
+3. The enemy may counterattack based on the quality of the player's action.
+4. Keep narration concise and immersive (2-3 sentences).
+5. round_summary: 1 sentence factual combat summary for memory.
 
 OUTPUT FORMAT — Return ONLY this JSON:
 {
@@ -850,6 +851,33 @@ function parseJsonSafe(text) {
   }
   console.error('JSON parse failed on:', text);
   throw new Error('Invalid JSON from LLM');
+}
+
+
+
+async function preloadNextMonster(targetBiome, targetEncounterIndex) {
+  const isBoss = targetEncounterIndex >= state.world.totalEncounters - 1;
+  
+  // Temporarily snapshot what the prompt builder needs from world state
+  const savedBiome  = state.world.biome;
+  const savedIndex  = state.world.encounterIndex;
+  
+  // Mutate for the prompt builder
+  state.world.biome           = targetBiome;
+  state.world.encounterIndex  = targetEncounterIndex;
+
+  try {
+    const prompt = buildMonsterPrompt(isBoss);
+    state.pendingMonster = await llmJSON(prompt);
+    console.log('[PRELOAD] Monster ready:', state.pendingMonster?.name);
+  } catch(e) {
+    console.warn('[PRELOAD] Monster preload failed:', e);
+    state.pendingMonster = null;
+  } finally {
+    // RESTORE THE STATE HERE
+    state.world.biome = savedBiome;
+    state.world.encounterIndex = savedIndex;
+  }
 }
 
 /* ============================================================
@@ -1080,13 +1108,16 @@ function startGame() {
   state.world.biomeHistory = [];
   state.player.statusEffect = '';
   state.world.encounterIndex = 0;
-  state.world.biome = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+
   state.combat.historyLog = [];
+
 
   document.getElementById('start-menu').style.display = 'none';
   state.phase = 'loading';
 
+  
   // Generate character sheet async (non-blocking — apply when ready)
+
   generateCharacterSheet();
 
   runEncounterLoop();
@@ -1178,27 +1209,35 @@ async function runEncounterLoop() {
   await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
 
   // Generate monster
+  // Generate monster
   await typeAsync('You press onwards...\n\n');
   let monsterData;
-  try {
-    const prompt = buildMonsterPrompt(isBoss);
-    monsterData = await llmJSON(prompt);
-  } catch(e) {
-    console.error('Monster generation failed:', e);
-    monsterData = {
-      name: isBoss ? 'Ancient Horror' : 'Cave Troll',
-      boss: isBoss ? 'Yes' : 'No',
-      description: 'A hulking, ancient creature of considerable menace.',
-      strengths: ['brute force', 'darkness'],
-      weaknesses: ['fire', 'light magic'],
-      intro: 'A monstrous shape looms from the shadows — eyes fixed on you with cold intent.',
-      hp: isBoss ? 80 : 40,
-      reward_pool: [
-        { item_name: 'Troll Fang', item_description: 'Adds force to melee attacks', flavour: 'Still warm from the kill.', rarity: 'Common' },
-        { item_name: 'Shadow Cloak', item_description: 'Reduces incoming damage from darkness attacks', flavour: 'Absorbs the light around you.', rarity: 'Uncommon' },
-        { item_name: 'Stone Heart', item_description: 'Increases resilience against physical blows', flavour: 'Heavy as regret.', rarity: 'Rare' },
-      ]
-    };
+  if (state.pendingMonster) {
+    monsterData = state.pendingMonster;
+    state.pendingMonster = null;
+    console.log('[PRELOAD] Consuming preloaded monster:', monsterData.name);
+  } else {
+    try {
+      const prompt = buildMonsterPrompt(isBoss);
+      monsterData = await llmJSON(prompt);
+    } catch(e) {
+      console.error('Monster generation failed:', e);
+      monsterData = {
+        name: isBoss ? 'Ancient Horror' : 'Cave Troll',
+        boss: isBoss ? 'Yes' : 'No',
+        description: 'A hulking, ancient creature of considerable menace.',
+        strengths: ['brute force', 'darkness'],
+        weaknesses: ['fire', 'light magic'],
+        intro: 'A monstrous shape looms from the shadows — eyes fixed on you with cold intent.',
+        hp: isBoss ? 80 : 40,
+        maxHp: isBoss ? 80 : 40,
+        reward_pool: [
+          { item_name: 'Troll Fang', item_description: 'Adds force to melee attacks', flavour: 'Still warm from the kill.', rarity: 'Common' },
+          { item_name: 'Shadow Cloak', item_description: 'Reduces incoming damage from darkness attacks', flavour: 'Absorbs the light around you.', rarity: 'Uncommon' },
+          { item_name: 'Stone Heart', item_description: 'Increases resilience against physical blows', flavour: 'Heavy as regret.', rarity: 'Rare' },
+        ]
+      };
+    }
   }
 
   state.monster = {
@@ -1325,16 +1364,18 @@ async function handleVictory() {
   const monster = state.monster;
   const biome   = state.world.biome;
   const isBoss  = state.world.encounterIndex >= state.world.totalEncounters - 1;
+  state.combat.historyLog = [];
 
   await typeAsync(`★ VICTORY! ${monster.name} has fallen! ★\n\n`);
-
+  console.log('[VICTORY] encounterIndex:', state.world.encounterIndex, 
+            'totalEncounters:', state.world.totalEncounters);
   // Victory narration
-  try {
-    const narration = await llmResponse(buildVictoryNarrationPrompt(null));
-    await typeAsync(narration.replace(/```[\s\S]*?```/g, '').trim() + '\n\n');
-  } catch(e) {
-    await typeAsync(`The ${monster.name} crumbles. Silence returns to ${biome.name}.\n\n`);
-  }
+  // try {
+  //   const narration = await llmResponse(buildVictoryNarrationPrompt(null));
+  //   await typeAsync(narration.replace(/```[\s\S]*?```/g, '').trim() + '\n\n');
+  // } catch(e) {
+  //   await typeAsync(`The ${monster.name} crumbles. Silence returns to ${biome.name}.\n\n`);
+  // }
 
   // Show reward overlay
   const rewardPool = monster.reward_pool && monster.reward_pool.length >= 3
@@ -1347,6 +1388,19 @@ async function handleVictory() {
 
   setBusy(false);
 
+    // Figure out the next biome/index before the player even picks their reward
+  const nextEncounterIndex = isBoss ? 0 : state.world.encounterIndex + 1;
+  const nextBiome = isBoss
+    ? (() => {
+        const unvisited = backgrounds.filter(b => !state.world.biomeHistory.includes(b) && b !== state.world.biome);
+        return unvisited.length ? unvisited[Math.floor(Math.random() * unvisited.length)] : null;
+      })()
+    : state.world.biome;
+
+  if (nextBiome) preloadNextMonster(nextBiome, nextEncounterIndex);
+
+  setBusy(false);
+
   showRewardOverlay(rewardPool, async (chosenItem) => {
     setBusy(true);
     state.player.inventory.push(chosenItem);
@@ -1356,15 +1410,26 @@ async function handleVictory() {
     await typeAsync(`Inventory: ${state.player.inventory.map(i => i.item_name).join(' | ')}\n\n`);
 
     if (isBoss) {
-      // End of run — biome complete
       await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
       await typeAsync('★★ THE BIOME IS CONQUERED ★★\n\n');
-      await typeAsync(`Encounters survived: ${state.world.encounterIndex + 1}\n`);
       await typeAsync(`Items collected: ${state.player.inventory.length}\n\n`);
-      await typeAsync('Type RESTART to begin a new run.\n');
-      inputEl.placeholder = 'Type RESTART...';
-      state.phase = 'dead';
-      setBusy(false);
+
+      state.world.biomeHistory.push(state.world.biome);
+      const unvisited = backgrounds.filter(b => !state.world.biomeHistory.includes(b));
+
+      if (unvisited.length === 0) {
+        await typeAsync('★★★ ALL REALMS CONQUERED ★★★\n\n');
+        await typeAsync('Type RESTART to begin a new run.\n');
+        inputEl.placeholder = 'Type RESTART...';
+        state.phase = 'dead';
+        setBusy(false);
+      } else {
+        state.world.encounterIndex = 0;
+        state.phase = 'between';
+        state.world.biome = nextBiome; 
+        inputEl.placeholder = 'Press ENTER to advance...';
+        setBusy(false);
+      }
     } else {
       state.world.encounterIndex += 1;
       state.phase = 'between';
@@ -1372,6 +1437,8 @@ async function handleVictory() {
       setBusy(false);
     }
   });
+
+
 }
 
 async function handleDeath() {

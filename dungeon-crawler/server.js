@@ -55,17 +55,18 @@ app.use(express.static('.'));
 
 app.post('/api/llm', async (req, res) => {
   try {
-    const ollamaRes = await fetch('http://100.75.17.119:11434/api/chat', {
+    const ollamaRes = await fetch(`http://${process.env.IP}:${process.env.PORT}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.PRIVATE_KEY}`,
       },
       body: JSON.stringify({
         // model: 'deepseek-r1:8b', // pick your local variant
         // model: 'deepseek-r1:1.5b', // pick your local variant
         // model: 'qwen3:4b', // pick your local variant
         // model: 'gemma4:e2b', // pick your local variant
-        model: 'gemma',
+        model: 'gemma4:latest',
         messages: [
           {
             role: 'user',
@@ -78,7 +79,7 @@ app.post('/api/llm', async (req, res) => {
 
     const text = await ollamaRes.text();
 
-    console.log('OLLAMA STATUS:', ollamaRes.status);
+    console.log('OLLAMA STATUS:', ollamaRes);
     console.log('OLLAMA RESPONSE:', text);
 
     if (!ollamaRes.ok) {
