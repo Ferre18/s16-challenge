@@ -239,8 +239,6 @@
       text-shadow: 0 0 5px rgba(242,234,211,0.5);
     }
 
-    .level-field { max-width: 140px; margin: 0 auto; grid-column: 1 / -1; }
-
     #start-btn {
       background: transparent;
       border: 2px solid #f2ead3;
@@ -419,10 +417,6 @@
         <label for="char-race-input">RACE</label>
         <input id="char-race-input" type="text" placeholder="Elf" autocomplete="off" spellcheck="false" maxlength="24"/>
       </div>
-      <div class="field level-field">
-        <label for="char-level-input">LEVEL</label>
-        <input id="char-level-input" type="number" value="1" min="1" max="20"/>
-      </div>
     </div>
 
     <button id="start-btn" onclick="startGame()">► BEGIN ◄</button>
@@ -446,7 +440,7 @@
     <span class="hud-label" id="monster-hp-label">100</span>
   </div>
 
-  <div id="titlebar">★ Super Dungeons & Prompts v2.0 ★</div>
+  <div id="titlebar">★ Super Dungeons & Prompts v3.0 ★</div>
 
   <div id="story-viewport">
     <div id="story-text"></div>
@@ -533,7 +527,6 @@ const state = {
     description: '',
     race: '',
     class: '',
-    level: 1,
     hp: 100,
     maxHp: 100,
     attributes: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
@@ -569,12 +562,15 @@ function buildCharacterPrompt() {
 Input Variables:
 Race: ${state.player.race}
 Class: ${state.player.class}
-Level: ${state.player.level}
 Description: ${state.player.description}
 
 Strict Rules for Generation:
-Attributes: Use Point Buy, considering the input variables. Assign these values based on the Class's primary needs and the provided Description. Apply Racial bonuses correctly.
-Armor Class (AC): Calculate based on the most appropriate starting armor for the class + DEX modifier.
+Attributes: Based on the description, assign scores that fit NPCs with the given traits and abilities. 
+
+Rules:
+1. Weak characters can have very low scores, even single digits. Strong characters can have very high scores, even above 20.
+2. If a character is described as a god, titan, cosmic entity, or reality-level being, assign ability scores at or above mortal maximums.
+3. Stats should reflect narrative scale, not class balance.
 
 Output Format:
 You MUST respond only with a valid JSON object following this exact structure:
@@ -613,7 +609,9 @@ function buildMonsterPrompt(isBoss) {
   const tier = getDifficultyTier(difficulty);
   return `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
-Generate a complete enemy profile for the player to face. The rewards should be based on the monster, but be usable against other monsters.
+Generate a complete enemy profile for the player to face. 
+
+The rewards should be character traits or items that can be used in combat. Never give consumables.
 
 Parameters:
 - Biome/Environment: ${biome.name} — ${biome.description}
@@ -643,6 +641,12 @@ function buildRoomNarrationPrompt() {
   const biome = state.world.biome;
   const monster = state.monster;
   const player = state.player;
+  const is_first_encounter =
+    state.world.encounterIndex === 0 ||
+    state.world.encounterIndex % state.encounterNum === 0;  
+  const entryDescription = is_first_encounter
+    ? "after stepping through a shifting portal that forces you into this place"
+    : "after moving deeper through the area";
   return `Role: You are an atmospheric Narrator and Dungeon Master for a dark fantasy adventure.
 
 Objective: Narrate the current scene. Immerse the player in the environment and build tension about a potential threat WITHOUT revealing the enemy's name directly.
@@ -650,13 +654,13 @@ Objective: Narrate the current scene. Immerse the player in the environment and 
 1. Environmental 
 - Describe very briefly the lighting, architecture, atmosphere using the biome.
 - Filter description through the player's class and race (e.g., a Rogue notices lack of footprints; a Paladin notices desecration).
-- Describe how your character reaches this place through a portal.
+- Describe how your character reaches this place ${entryDescription}.
 - Describe how the monster appears and the general appearance.
 
 2. End the narration at the "beat" before combat begins — the moment tension peaks.
 
 INPUTS:
-Player: Level ${player.level} ${player.race} ${player.class} — "${player.description}" — carrying: ${player.inventory.length ? player.inventory.map(i=>i.item_name).join(', ') : 'nothing'}
+Player: ${player.race} ${player.class} — "${player.description}" — carrying: ${player.inventory.length ? player.inventory.map(i=>i.item_name).join(', ') : 'nothing'}
 Biome: ${biome.name} — ${biome.description} — Mood: ${biome.mood}
 Enemy hints (do NOT name it): ${monster.description}
 
@@ -678,7 +682,6 @@ INPUTS:
 - player_context:
   - class: ${player.class}
   - race: ${player.race}
-  - level: ${player.level}
   - description: ${player.description}
   - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
   - status: "${player.statusEffect || 'none'}"
@@ -690,14 +693,15 @@ INPUTS:
 
 VALIDATION RULES:
 1. Attempting the action must be physically and narratively possible within the established fantasy setting.
-2. Player CANNOT use items not in their inventory.
+2. Player CANNOT use items not in their inventory or character description.
 3. Player CANNOT cast spells or use powers not supported by their class/attributes.
 4. Player CAN use held items creatively, describe physical actions, improvise with the environment.
 5. Be permissive with creativity if the action is plausible.
 6. Reject actions that contradict prior round summaries.
 7. Assume medieval fantasy setting unless context states otherwise.
-8. Magical actions should be constrained by the typical limitations of a Dungeons and Dragons setting. Use the character level for guidance on what is reasonable.
+8. Magical actions should be constrained by the typical limitations of a Dungeons and Dragons setting. Use the character details for guidance on what is reasonable.
 9. Actions with bad outcomes, like trying to punch a dragon, can be valid. The outcome will just be bad. Do not reject an action solely based on potential negative consequences.
+10. Statements in the player description are literal and mechanically authoritative unless explicitly contradicted.
 
 OUTPUT FORMAT — Return ONLY this JSON:
 {
@@ -724,6 +728,7 @@ Evaluate the player's action and determine:
 - How the health points of both the player and the enemy would change as a result of this action.
 - A short immersive combat narration
 - A brief round summary for memory
+- Reward gathering information on the monster's weaknesses and strengths
 - Use that for a normal human warrior, facing this enemy is considered: ${tier.label}.
 
 INPUTS:
@@ -739,28 +744,31 @@ INPUTS:
 - recent_combat_history:\n${recentHistory || 'Turn 1 — no prior history.'}
 - player_action: "${playerAction}"
 - player_context:
-  - race: ${player.race}, class: ${player.class}, level: ${player.level}
+  - race: ${player.race}, class: ${player.class}
   - description: ${player.description}
   - items: [${player.inventory.map(i => i.item_name).join(', ') || 'none'}]
   - attributes: STR ${player.attributes.strength}, DEX ${player.attributes.dexterity}, INT ${player.attributes.intelligence}
   - armor_class: ${player.armor_class}
-  - status: "${player.statusEffect || 'none'}"
+  - player_status: The player is currently affected by "${player.statusEffect || 'none'}"
 
 COMBAT RULES:
-1. Strongly reward clever tactics, exploiting weaknesses, environmental usage, item synergy.
-2. Penalize ignoring obvious weaknesses, ineffective attacks, impossible actions.
-3. The enemy may counterattack based on the quality of the player's action.
-4. Keep narration concise and immersive (2-3 sentences).
-5. round_summary: 1 sentence factual combat summary for memory.
+1. Treat character descriptions and established feats as mechanically real.
+2. Combat outcomes must reflect actual scale and power differences.
+3. Extremely weaker enemies may be unable to harm stronger entities at all.
+4. Counterattacks only happen if the enemy realistically survives or can respond.
+5. Do not force balanced combat, equal exchanges, or RPG fairness.
+6. Resolve actions logically and consistently with prior events.
+7. Keep narration concise.
 
 OUTPUT FORMAT — Return ONLY this JSON:
 {
-  "outcome": "Short immersive narration of the result of the player's action and the enemy's response",
+  "outcome": "Narration of the result of the player's action and the enemy's action if any",
+  "round_summary": "brief factual summary",
   "damage_dealt": integer,
   "damage_received": integer,
-  "status": "status effect name or empty string",
-  "round_summary": "brief factual summary",
-  "result": "ongoing" | "player_wins" | "monster_wins"
+  "player_status": "status effects names separated by commas or empty string",
+  "enemy_status": "status effects names separated by commas or empty string",
+  "result": "ongoing" | "player_wins" | "monster_wins" | "player_escape"
 }
 
 IMPORTANT: Output must be valid JSON only. No markdown. No explanations outside the JSON.`;
@@ -781,7 +789,7 @@ Objective: Narrate the immediate aftermath of combat. Transition from the heat o
 4. Tone: A near-death victory feels harrowing and lucky. A clean victory feels gritty but empowering.
 
 INPUTS:
-Player: Level ${player.level} ${player.race} ${player.class} — "${player.description}"
+Player: Race '${player.race}', Class '${player.class}' — "${player.description}"
 Biome: ${biome.name} — ${biome.description}
 Enemy: ${monster.name} — ${monster.description}
 Last outcome: ${state.combat.lastOutcome}
@@ -865,7 +873,9 @@ async function preloadNextMonster(targetBiome, targetEncounterIndex) {
 
   const prompt = `Act as an Enemy Designer and Game Master for a fantasy dungeon crawler video game. The game features a unique combat system called "Prompt Attack" where players attack by writing prompts describing their action, spell, or tactic.
 
-Generate a complete enemy profile for the player to face. The rewards should be based on the monster, but be usable against other monsters.
+Generate a complete enemy profile for the player to face. 
+
+The rewards should be character traits or items that can be used in combat. Never give consumables.
 
 Parameters:
 - Biome/Environment: ${targetBiome.name} — ${targetBiome.description}
@@ -883,6 +893,7 @@ Use exactly this JSON structure:
   "weaknesses": ["element or concept it is vulnerable to", "another weakness"],
   "intro": "1-2 sentence atmospheric introduction shown when the monster appears.",
   "hp": ${isBoss ? Math.min(60 + difficulty * 10, 120) : Math.min(30 + difficulty * 12, 80)},
+  "statusEffects": "",
   "reward_pool": [
     { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
     { "item_name": "string", "item_description": "short mechanical/thematic description", "flavour": "one eerie sentence", "rarity": "Common|Uncommon|Rare" },
@@ -892,6 +903,7 @@ Use exactly this JSON structure:
 
   try {
     state.pendingMonster = await llmJSON(prompt);
+    state.pendingMonster.statusEffects = "";
     console.log('[PRELOAD] Monster ready:', state.pendingMonster?.name);
   } catch(e) {
     console.warn('[PRELOAD] Monster preload failed:', e);
@@ -1115,12 +1127,10 @@ function startGame() {
   const desc        = document.getElementById('char-desc-input').value.trim() || 'a wandering soul';
   const playerClass = document.getElementById('char-class-input').value.trim() || 'Warrior';
   const race        = document.getElementById('char-race-input').value.trim()  || 'Human';
-  const level       = parseInt(document.getElementById('char-level-input').value) || 1;
 
   state.player.description  = desc;
   state.player.class        = playerClass;
   state.player.race         = race;
-  state.player.level        = level;
   state.player.hp           = 100;
   state.player.maxHp        = 100;
   state.player.inventory    = [];
@@ -1237,6 +1247,7 @@ async function runEncounterLoop() {
     try {
       const prompt = buildMonsterPrompt(isBoss);
       monsterData = await llmJSON(prompt);
+      monsterData.statusEffects = "";
     } catch(e) {
       console.error('Monster generation failed:', e);
       monsterData = {
@@ -1349,7 +1360,9 @@ async function handleCombatAction(action) {
   state.player.hp   -= dmgReceived;
   state.combat.turnNumber++;
 
-  if (result.status) state.player.statusEffect = result.status;
+  if (result.player_status) state.player.statusEffect = result.player_status;
+  if (result.enemy_status) state.monster.statusEffect = result.enemy_status;
+
   state.combat.lastOutcome = result.outcome || '';
 
   // Store round summary in history
@@ -1362,20 +1375,22 @@ async function handleCombatAction(action) {
 
   await typeAsync((result.outcome || '') + '\n');
   if (dmgDealt    > 0) await typeAsync(`  You deal ${dmgDealt} damage. (${state.monster.name}: ${Math.max(0, state.monster.hp)} HP)\n`);
+  if (result.enemy_status) await typeAsync(`  Enemy Status: [${result.enemy_status.toUpperCase()}]\n`);
   if (dmgReceived > 0) await typeAsync(`  You take ${dmgReceived} damage. (You: ${Math.max(0, state.player.hp)} HP)\n`);
-  if (result.status) await typeAsync(`  Status: [${result.status.toUpperCase()}]\n`);
+  if (result.player_status) await typeAsync(`  Player Status: [${result.player_status.toUpperCase()}]\n`);
+
   await typeAsync('\n');
 
   // Check outcome
-  const win  = result.result === 'player_wins' || state.monster.hp <= 0;
+  const win  = result.result === 'player_wins' || state.monster.hp <= 0 || result.result === 'player_escape';
   const lose = result.result === 'monster_wins' || state.player.hp <= 0;
 
-  if (win)       { await handleVictory(); }
+  if (win)       { await handleVictory(result.result === 'player_escape'); }
   else if (lose) { await handleDeath(); }
   else           { setBusy(false); }
 }
 
-async function handleVictory() {
+async function handleVictory(playerEscaped) {
   hideHUD();
   music.stop();
   const monster = state.monster;
@@ -1408,13 +1423,16 @@ async function handleVictory() {
 
   if (nextBiome) preloadNextMonster(nextBiome, nextEncounterIndex);
 
-  showRewardOverlay(rewardPool, async (chosenItem) => {
-    setBusy(true);
-    state.player.inventory.push(chosenItem);
 
-    await typeAsync(`  [ ITEM GAINED: ${chosenItem.item_name} ]\n`);
-    await typeAsync(`  "${chosenItem.flavour}"\n\n`);
-    await typeAsync(`Inventory: ${state.player.inventory.map(i => i.item_name).join(' | ')}\n\n`);
+  showRewardOverlay(rewardPool, async (chosenItem) => {
+    if (!playerEscaped) {
+      setBusy(true);
+      state.player.inventory.push(chosenItem);
+
+      await typeAsync(`  [ ITEM GAINED: ${chosenItem.item_name} ]\n`);
+      await typeAsync(`  "${chosenItem.flavour}"\n\n`);
+      await typeAsync(`Inventory: ${state.player.inventory.map(i => i.item_name).join(' | ')}\n\n`);
+    }
 
     if (isBoss) {
       await typeAsync('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
